@@ -197,7 +197,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       setSyncStatus("error");
     }
-  }, [projects, pillars, reports, messages, systems, candidates]);
+  }, [projects, pillars, reports, messages, systems, candidates, settings]);
 
   // ── Projects ──
   const addProject = useCallback((p: Omit<CaseProject, "id">) => {

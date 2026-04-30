@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAdmin } from "@/context/AdminContext";
 import { Upload, Trash2, Eye, EyeOff, User, Save } from "lucide-react";
+import Image from "next/image";
 
 export function IdentityManager() {
   const { settings, updateSettings } = useAdmin();
