@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 import { useAdmin, Report } from "@/context/AdminContext";
-import { Plus, Edit2, Trash2, X, FileText, Upload, Save } from "lucide-react";
+import { Plus, Edit2, Trash2, X, FileText, Save, ExternalLink } from "lucide-react";
+import { DocumentUploader } from "@/components/DocumentUploader";
 
-const emptyReport = (): Omit<Report, "id"> => ({ title: "", description: "", fileName: "" });
+const emptyReport = (): Omit<Report, "id"> => ({ 
+  title: "", 
+  description: "", 
+  fileName: "",
+  cloudUrl: "",
+  fileType: "",
+  category: "Report",
+});
 
 function ReportForm({ initial, onSave, onCancel, title }: { initial: Omit<Report, "id">; onSave: (r: Omit<Report, "id">) => void; onCancel: () => void; title: string; }) {
   const [form, setForm] = useState(initial);
@@ -30,15 +38,34 @@ function ReportForm({ initial, onSave, onCancel, title }: { initial: Omit<Report
           <textarea required value={form.description} onChange={(e) => set("description", e.target.value)} rows={4} placeholder="Technical abstract for this engineering report..." className="bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all resize-none placeholder:text-white/20" />
         </div>
         <div className="flex flex-col gap-2 border border-[#00F2FF]/15 rounded-lg p-4 bg-black/20">
-          <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase flex items-center gap-2">
-            <Upload className="w-3 h-3" /> Attach PDF Document
+          <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase flex items-center gap-2 mb-2">
+            Attach Document
           </label>
-          <input type="file" accept=".pdf" onChange={handleFile} className="text-[9px] text-white/40 font-mono file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer" />
-          {form.fileName && <p className="font-mono text-[9px] text-[#00F2FF] truncate">Staged: {form.fileName}</p>}
-          {!form.fileName && (
-            <div className="flex flex-col gap-1.5 mt-1">
-              <label className="font-mono text-[8px] tracking-widest text-[#94A3B8]/40 uppercase">Or enter filename manually</label>
-              <input type="text" value={form.fileName} onChange={(e) => set("fileName", e.target.value)} placeholder="e.g., Report_Name_v1.pdf" className="bg-black/30 border border-white/10 rounded px-2.5 py-1.5 font-mono text-[10px] text-white/80 focus:outline-none focus:border-[#00F2FF]/40 transition-all" />
+          <DocumentUploader 
+            folder="dossier/reports" 
+            onUploadComplete={(meta) => {
+              setForm(prev => ({
+                ...prev,
+                fileName: meta.fileName,
+                cloudUrl: meta.cloudUrl,
+                fileType: meta.fileType,
+                uploadDate: new Date().toISOString()
+              }));
+            }} 
+          />
+          {form.fileName && (
+            <div className="mt-4 p-3 bg-[#00F2FF]/5 border border-[#00F2FF]/20 rounded-lg flex items-center justify-between">
+              <div>
+                <p className="font-mono text-[10px] text-[#00F2FF] truncate font-bold">{form.fileName}</p>
+                <p className="font-mono text-[8px] text-[#94A3B8] tracking-widest mt-1">
+                  TYPE: {form.fileType || "UNKNOWN"} | READY FOR COMMIT
+                </p>
+              </div>
+              {form.cloudUrl && (
+                <a href={form.cloudUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#00F2FF]/10 text-[#00F2FF] rounded hover:bg-[#00F2FF] hover:text-black transition-colors">
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -114,8 +141,13 @@ export function DossierVault() {
                 </div>
               </div>
               <p className="font-mono text-[10px] text-[#94A3B8]/70 leading-relaxed border-l border-[#00F2FF]/20 pl-3 line-clamp-3">{report.description}</p>
-              <div className="mt-auto pt-3 border-t border-[#00F2FF]/10">
-                <p className="font-mono text-[9px] text-[#00F2FF]/50 truncate">{report.fileName || "No file attached"}</p>
+              <div className="mt-auto pt-3 border-t border-[#00F2FF]/10 flex items-center justify-between">
+                <p className="font-mono text-[9px] text-[#00F2FF]/50 truncate max-w-[70%]">{report.fileName || "No file attached"}</p>
+                {report.cloudUrl && (
+                  <a href={report.cloudUrl} target="_blank" rel="noopener noreferrer" className="font-mono text-[8px] text-[#00F2FF] border border-[#00F2FF]/30 px-2 py-1 rounded hover:bg-[#00F2FF] hover:text-black transition-colors">
+                    VIEW CLOUD ASSET
+                  </a>
+                )}
               </div>
             </div>
           ))}

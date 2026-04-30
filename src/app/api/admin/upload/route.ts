@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
+    const folder = (formData.get("folder") as string) || "portfolio/media";
     
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
@@ -17,13 +23,29 @@ export async function POST(request: Request) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      // Create a unique filename
-      const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-      const relativePath = `/assets/projects/${filename}`;
-      const absolutePath = path.join(process.cwd(), "public", relativePath);
+      const isImage = file.type.startsWith('image/');
 
-      fs.writeFileSync(absolutePath, buffer);
-      uploadedUrls.push(relativePath);
+      const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { 
+            folder: folder,
+            resource_type: isImage ? 'image' : 'raw',
+            ...(isImage && {
+              width: 1920,
+              crop: "limit",
+              fetch_format: "webp",
+              quality: "auto",
+            }),
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+        stream.end(buffer);
+      });
+
+      uploadedUrls.push((uploadResult as any).secure_url);
     }
 
     return NextResponse.json({ urls: uploadedUrls, message: "UPLOAD SUCCESSFUL" });

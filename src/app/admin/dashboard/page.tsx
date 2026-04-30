@@ -102,6 +102,12 @@ export default function DashboardPage() {
       {/* Ambient grid */}
       <div className="fixed inset-0 bg-[linear-gradient(to_right,rgba(0,242,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,242,255,0.025)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
 
+      {syncStatus === "success" && (
+        <div className="fixed top-0 left-0 right-0 bg-[#00F2FF] text-black font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-center py-2 animate-in slide-in-from-top-full duration-300 z-50 shadow-[0_0_20px_rgba(0,242,255,0.5)]">
+          SYSTEM SYNC COMPLETE - CLOUD DATA UPDATED
+        </div>
+      )}
+
       {/* Top Command Bar */}
       <header className="relative z-20 border-b border-[#00F2FF]/15 bg-[#020617]/90 backdrop-blur-md px-6 py-3 flex items-center justify-between gap-6">
         {/* Left: Identity */}

@@ -28,6 +28,10 @@ export type Report = {
   title: string;
   description: string;
   fileName: string;
+  uploadDate?: string;
+  cloudUrl?: string;
+  fileType?: string;
+  category?: string;
 };
 
 export type Message = {
