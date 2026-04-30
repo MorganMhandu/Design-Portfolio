@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 const DB_PATH = path.join(process.cwd(), "src/data/db.json");
 
 function readDB() {
@@ -16,7 +18,11 @@ function writeDB(data: any) {
 export async function GET() {
   try {
     const data = readDB();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    });
   } catch (error) {
     return NextResponse.json({ error: "Failed to read database" }, { status: 500 });
   }
