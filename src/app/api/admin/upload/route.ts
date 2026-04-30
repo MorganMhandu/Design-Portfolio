@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+import { createClient } from "@supabase/supabase-js";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+// Prioritize Service Role Key for elevated backend access, fallback to Anon Key if necessary
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-assets";
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false },
 });
 
 export async function POST(request: Request) {
@@ -17,40 +21,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
     }
 
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json({ error: "Supabase credentials missing from environment" }, { status: 500 });
+    }
+
     const uploadedUrls: string[] = [];
 
     for (const file of files) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const isImage = file.type.startsWith('image/');
+      // Create a unique filename to prevent collisions
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const filename = `${folder}/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
 
-      const uploadResult = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { 
-            folder: folder,
-            resource_type: isImage ? 'image' : 'raw',
-            ...(isImage && {
-              width: 1920,
-              crop: "limit",
-              fetch_format: "webp",
-              quality: "auto",
-            }),
-          },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        );
-        stream.end(buffer);
-      });
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(filename, buffer, {
+          contentType: file.type,
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      uploadedUrls.push((uploadResult as any).secure_url);
+      if (error) {
+        throw new Error(`Supabase upload error: ${error.message}`);
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(filename);
+
+      uploadedUrls.push(publicUrlData.publicUrl);
     }
 
     return NextResponse.json({ urls: uploadedUrls, message: "UPLOAD SUCCESSFUL" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Upload failed" }, { status: 500 });
   }
 }
