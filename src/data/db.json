@@ -1,0 +1,102 @@
+{
+  "projects": [
+    {
+      "id": "proj-1",
+      "title": "Autonomous Material Handling",
+      "focus": "Predictive Maintenance & Load Optim",
+      "components": "Grizzly bars, and Heavy-duty Conveyors",
+      "automation": "PLC Load Monitoring, Proximity Sensors, and Automated Feeder Control.",
+      "images": [
+        "/images/autonomous-material-handling.jpg",
+        "/assets/projects/1777451391223-COMBINED-CYCLE_POWER_PLANT,_Jason_Heydens.jfif",
+        "/assets/projects/1777451391226-tubería_y_tubería_en_un_petróleo_refinería.jfif"
+      ],
+      "cadSize": "142 MB",
+      "dwgSize": "18 MB",
+      "renderSize": "1.2 GB"
+    }
+  ],
+  "pillars": [
+    {
+      "id": "pillar-1",
+      "title": "Mechanical Design & Simulation",
+      "iconName": "Hexagon",
+      "bullets": [
+        "Precision Assembly Modeling",
+        "Structural Integrity & FEA",
+        "Advanced GD&T",
+        "High-Fidelity Visualization (Blender/Lumion)"
+      ]
+    },
+    {
+      "id": "pillar-2",
+      "title": "Automation & Control Systems",
+      "iconName": "Cpu",
+      "bullets": [
+        "Mechatronic Integration",
+        "PLC Logic & Smart Monitoring",
+        "Fluid Power & Slurry Transport",
+        "Equipment health tracking"
+      ]
+    },
+    {
+      "id": "pillar-3",
+      "title": "Plant Engineering & Maintenance",
+      "iconName": "Wrench",
+      "bullets": [
+        "Reliability Centered Maintenance (RCM)",
+        "Root Cause Analysis (RCA)",
+        "Asset Lifecycle Management",
+        "Process Optimization"
+      ]
+    },
+    {
+      "id": "pillar-4",
+      "title": "Manufacturing & Production",
+      "iconName": "Crosshair",
+      "bullets": [
+        "Design for Manufacturing (DFM/CNC)",
+        "SHEQ & ISO Compliance",
+        "Specialized Tooling & Jigs",
+        "Material Science"
+      ]
+    },
+    {
+      "id": "pillar-5",
+      "title": "Digital & Web Engineering",
+      "iconName": "Code",
+      "bullets": [
+        "Engineering Dashboards (Next.js/Tailwind)",
+        "Full-Stack Technical Tooling",
+        "Interactive 3D UI",
+        "Agile Documentation"
+      ]
+    }
+  ],
+  "reports": [],
+  "messages": [],
+  "systems": [
+    {
+      "id": "sys-1",
+      "title": "Interactive Engineering Visualizer",
+      "techStack": [
+        "Next.js",
+        "Framer Motion"
+      ],
+      "description": "A platform for real-time 3D technical visualization. Engineered to bridge the gap between heavy CAD documentation and accessible web-based portfolio demonstrations.",
+      "link": "#",
+      "version": "V1.0"
+    }
+  ],
+  "candidates": [],
+  "settings": {
+    "profilePicture": "",
+    "showProfilePicture": true,
+    "contact": {
+      "phone": "+263 773 745 068",
+      "whatsapp": "https://wa.me/263773745068",
+      "email": "morganmichaelmhandu@gmail.com",
+      "location": "Harare, Zimbabwe"
+    }
+  }
+}
