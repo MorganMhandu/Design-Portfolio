@@ -299,7 +299,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   // ── Candidates ──
   const addCandidate = useCallback((c: Omit<Candidate, "id" | "timestamp" | "status">) => {
-    const newList = [
+    const newList: Candidate[] = [
       { ...c, id: uid(), timestamp: new Date().toISOString(), status: "Pending" },
       ...candidates,
     ];
