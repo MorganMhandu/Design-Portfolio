@@ -2,21 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
-import { FileText, FileBarChart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { FileText, FileBarChart, ChevronLeft, ChevronRight, X, Maximize2, Download } from "lucide-react";
 import Image from "next/image";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
+import { motion, AnimatePresence } from "framer-motion";
 
-function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
+function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () => void }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
-  useEffect(() => {
-    if (!project.images || project.images.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % project.images.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [project.images]);
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -29,142 +21,178 @@ function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
   };
 
   return (
-    <div className="relative flex flex-col border border-[#00F2FF]/10 bg-[#020617]/80 backdrop-blur-md rounded-2xl hover:border-[#00F2FF]/40 transition-all duration-500 group overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+      />
       
-      {/* 1. VISUAL LAYER (Carousel) */}
-      <div className="relative w-full h-[300px] bg-[#000814] overflow-hidden group/carousel">
-        {project.images && project.images.length > 0 ? (
-          <>
-            <div className="relative w-full h-full flex items-center justify-center cursor-pointer" onClick={() => setIsLightboxOpen(true)}>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="relative w-full max-w-6xl max-h-[90vh] bg-[#020617] border border-[#00F2FF]/20 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.15)] flex flex-col md:flex-row"
+      >
+        <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white bg-white/5 p-2 rounded-full transition-colors z-[220]"><X className="w-6 h-6" /></button>
+
+        {/* Left: Visual Area */}
+        <div className="w-full md:w-3/5 h-[300px] md:h-auto bg-black relative group/carousel border-b md:border-b-0 md:border-r border-[#00F2FF]/10">
+          {project.images && project.images.length > 0 ? (
+            <>
               <Image 
                 src={project.images[currentImageIndex]} 
-                alt={`${project.title} - Render ${currentImageIndex + 1}`} 
-                width={800} 
-                height={600} 
-                className="w-full h-full object-contain opacity-100 transition-all duration-700 group-hover:scale-105"
-                priority={idx < 2}
-                key={`${project.id}-${currentImageIndex}`}
+                alt={project.title} 
+                fill
+                className="object-contain"
+                priority
               />
+              {project.images.length > 1 && (
+                <>
+                  <button onClick={handlePrev} className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 hover:bg-[#00F2FF] hover:text-black transition-all z-10"><ChevronLeft className="w-6 h-6" /></button>
+                  <button onClick={handleNext} className="absolute right-6 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 hover:bg-[#00F2FF] hover:text-black transition-all z-10"><ChevronRight className="w-6 h-6" /></button>
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+                    {project.images.map((_, i) => (
+                      <button key={i} onClick={() => setCurrentImageIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] w-8" : "bg-white/20 hover:bg-white/40"}`} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[#00F2FF]/20 font-mono text-sm tracking-widest uppercase">No Visual Data</div>
+          )}
+        </div>
+
+        {/* Right: Content Area */}
+        <div className="w-full md:w-2/5 p-8 md:p-12 overflow-y-auto flex flex-col">
+          <div className="mb-8">
+            <span className="font-mono text-xs tracking-[0.3em] text-[#00F2FF]/60 uppercase mb-4 block">Case_Study_Details</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight bg-gradient-to-r from-white to-[#94A3B8] bg-clip-text text-transparent">{project.title}</h2>
+          </div>
+
+          <div className="space-y-8 mb-12">
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">System Focus</span>
+              <p className="text-sm text-white/70 leading-relaxed font-light">{project.focus}</p>
             </div>
             
-            {project.images.length > 1 && (
-              <>
-                <button onClick={handlePrev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 p-2 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronLeft className="w-5 h-5" /></button>
-                <button onClick={handleNext} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 p-2 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronRight className="w-5 h-5" /></button>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                  {project.images.map((_, i) => (
-                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }} className={`w-2 h-2 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] w-4" : "bg-white/20 hover:bg-white/40"}`} />
-                  ))}
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-[#020617]/50">
-             <span className="font-mono text-xs text-[#00F2FF]/30 tracking-widest uppercase">No Visual Data</span>
+            <div className="grid grid-cols-1 gap-6 pt-6 border-t border-white/5">
+              <div className="flex flex-col gap-2">
+                <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">Mechanical Components</span>
+                <p className="text-sm text-white/60 leading-relaxed">{project.components}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">Automation Stack</span>
+                <p className="text-sm text-white/60 leading-relaxed">{project.automation}</p>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* 2. CONTENT LAYER */}
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-start justify-between mb-4">
-          <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300">
+          {/* Actions */}
+          <div className="mt-auto space-y-4 pt-8 border-t border-white/5">
+            <button className="w-full flex items-center justify-between px-6 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-2xl hover:bg-[#00F2FF] hover:text-black transition-all group/zip">
+              <div className="flex items-center gap-4">
+                <Download className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-mono text-xs font-bold uppercase tracking-widest">Project Assets</p>
+                  <p className="text-[10px] opacity-70 uppercase tracking-tighter">CAD + Renders (ZIP)</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 opacity-30 group-hover/zip:translate-x-1 transition-all" />
+            </button>
+
+            <button className="w-full flex items-center justify-between px-6 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/30 transition-all group/pdf">
+              <div className="flex items-center gap-4 text-white">
+                <FileText className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="font-mono text-xs font-bold uppercase tracking-widest">Technical Reports</p>
+                  <p className="text-[10px] opacity-50 uppercase tracking-tighter">Engineering Documentation (PDF)</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 opacity-20 group-hover/pdf:translate-x-1 transition-all" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: idx * 0.1 }}
+        onClick={() => setIsModalOpen(true)}
+        className="group relative aspect-square bg-[#020617] border border-[#00F2FF]/10 rounded-2xl overflow-hidden cursor-pointer hover:border-[#00F2FF]/40 transition-all duration-500 shadow-xl"
+      >
+        {/* Background Render */}
+        <div className="absolute inset-0 z-0">
+          {project.images && project.images[0] ? (
+            <Image 
+              src={project.images[0]} 
+              alt={project.title} 
+              fill
+              className="object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-black/40">
+              <span className="font-mono text-[10px] text-[#00F2FF]/20 uppercase tracking-widest">No Visual</span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
+        </div>
+
+        {/* Content Overlay */}
+        <div className="absolute inset-0 z-10 p-5 flex flex-col justify-end">
+          <span className="font-mono text-[9px] tracking-[0.3em] text-[#00F2FF]/60 uppercase mb-2">PROJ_{idx + 1}</span>
+          <h3 className="text-sm font-bold text-white mb-4 line-clamp-2 leading-snug group-hover:text-[#00F2FF] transition-colors">
             {project.title}
           </h3>
-          <span className="font-mono text-[10px] tracking-[0.2em] text-[#00F2FF]/40 uppercase mt-1">PROJ_{idx + 1}</span>
-        </div>
-
-        <div className="space-y-4 mb-8">
-          <div className="flex flex-col gap-1">
-            <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">System Focus</span>
-            <p className="text-sm text-white/70 leading-relaxed font-light line-clamp-2">{project.focus}</p>
-          </div>
           
-          <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/5">
-            <div className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">Mechanics</span>
-              <p className="text-xs text-white/50 leading-tight truncate">{project.components}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">Automation</span>
-              <p className="text-xs text-white/50 leading-tight truncate">{project.automation}</p>
-            </div>
+          <div className="flex items-center gap-2 text-[10px] font-mono text-[#00F2FF] uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+            View Project <Maximize2 className="w-3 h-3" />
           </div>
         </div>
 
-        {/* 3. REFINED ACTION BAY */}
-        <div className="mt-auto flex flex-col gap-3">
-          <button className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/5 border border-[#00F2FF]/10 rounded-xl hover:bg-[#00F2FF]/10 hover:border-[#00F2FF]/30 transition-all group/btn">
-            <div className="flex items-center gap-4">
-              <div className="p-2.5 bg-black/30 rounded-lg text-[#00F2FF] border border-[#00F2FF]/10">
-                <FileBarChart className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-mono text-xs text-white tracking-widest uppercase">Technical Assets</p>
-                <p className="font-mono text-[9px] text-[#00F2FF]/50 uppercase">Download ZIP Package</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-white/20 group-hover/btn:translate-x-1 transition-transform" />
-          </button>
+        {/* Hover Border Glow */}
+        <div className="absolute inset-0 border border-[#00F2FF]/0 group-hover:border-[#00F2FF]/40 transition-colors pointer-events-none rounded-2xl" />
+      </motion.div>
 
-          <button className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf">
-            <div className="flex items-center gap-4">
-              <div className="p-2.5 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
-                <FileText className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <p className="font-mono text-xs tracking-widest uppercase">Engineering Reports</p>
-                <p className="font-mono text-[9px] opacity-60 uppercase">View Technical PDF</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 opacity-20 group-hover/pdf:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </div>
-
-      {/* Lightbox remains same but updated IDs/Keys */}
-      {isLightboxOpen && project.images && project.images.length > 0 && (
-        <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 backdrop-blur-xl">
-          <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 p-2 rounded-full transition-colors z-[210]"><X className="w-8 h-8" /></button>
-          <div className="relative w-full h-full flex items-center justify-center">
-            <Image src={project.images[currentImageIndex]} alt={`${project.title} - Lightbox`} width={3000} height={2000} className="max-w-full max-h-full object-contain" quality={100} />
-            {project.images.length > 1 && (
-              <>
-                <button onClick={handlePrev} className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/50 p-4 rounded-full text-[#00F2FF] border border-[#00F2FF]/50 hover:bg-[#00F2FF]/20 transition-colors z-[210]"><ChevronLeft className="w-8 h-8" /></button>
-                <button onClick={handleNext} className="absolute right-6 top-1/2 -translate-y-1/2 bg-black/50 p-4 rounded-full text-[#00F2FF] border border-[#00F2FF]/50 hover:bg-[#00F2FF]/20 transition-colors z-[210]"><ChevronRight className="w-8 h-8" /></button>
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-[210]">
-                  {project.images.map((_, i) => <button key={i} onClick={() => setCurrentImageIndex(i)} className={`w-3 h-3 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] shadow-[0_0_12px_rgba(0,242,255,1)]" : "bg-white/30 hover:bg-white/60"}`} />)}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {isModalOpen && (
+          <ProjectModal 
+            project={project} 
+            onClose={() => setIsModalOpen(false)} 
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
 export function CaseStudies() {
   const { projects } = useAdmin();
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  useEffect(() => {
-    setRefreshKey(prev => prev + 1);
-  }, [projects]);
-
   const validProjects = projects.filter(p => p.title || p.focus || p.components || p.automation);
 
   return (
     <Section id="projects">
       <SectionHeading>Technical Case Studies</SectionHeading>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 relative">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 relative">
           {validProjects.map((project, idx) => (
             <ProjectCard key={project.id} project={project} idx={idx} />
           ))}
           {validProjects.length === 0 && (
             <div className="col-span-full text-center py-24 font-mono text-[#94A3B8]/30 text-xs tracking-widest uppercase border border-dashed border-[#00F2FF]/10 rounded-2xl">
-              No case studies published. Add projects via the Admin Dashboard.
+              No case studies published.
             </div>
           )}
         </div>
