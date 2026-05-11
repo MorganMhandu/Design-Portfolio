@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
-import { FileText, FileBarChart, ChevronLeft, ChevronRight, X, Maximize2, Download } from "lucide-react";
+import { FileText, FileBarChart, ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
-import { motion, AnimatePresence } from "framer-motion";
 
-function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () => void }) {
+import { AnimatePresence, motion } from "framer-motion";
+
+function ProjectModal({ project, idx, onClose }: { project: CaseProject; idx: number; onClose: () => void }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handlePrev = (e: React.MouseEvent) => {
@@ -21,22 +22,21 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8 bg-[#000814]/95 backdrop-blur-xl"
+      onClick={onClose}
+    >
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-      />
-      
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-6xl max-h-[90vh] bg-[#020617] border border-[#00F2FF]/20 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.15)] flex flex-col md:flex-row"
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        className="relative w-full max-w-5xl max-h-[90vh] bg-[#020617] border border-[#00F2FF]/20 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.15)] flex flex-col md:flex-row"
+        onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white bg-white/5 p-2 rounded-full transition-colors z-[220]"><X className="w-6 h-6" /></button>
+        <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-[#00F2FF] bg-white/5 p-2 rounded-full transition-all z-[210] border border-white/10"><X className="w-6 h-6" /></button>
 
         {/* Left: Visual Area */}
         <div className="w-full md:w-3/5 h-[300px] md:h-auto bg-black relative group/carousel border-b md:border-b-0 md:border-r border-[#00F2FF]/10">
@@ -45,157 +45,151 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
               <Image 
                 src={project.images[currentImageIndex]} 
                 alt={project.title} 
-                fill
-                className="object-contain"
-                priority
+                width={1200} 
+                height={900} 
+                className="w-full h-full object-contain p-4 md:p-8"
               />
               {project.images.length > 1 && (
                 <>
-                  <button onClick={handlePrev} className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 hover:bg-[#00F2FF] hover:text-black transition-all z-10"><ChevronLeft className="w-6 h-6" /></button>
-                  <button onClick={handleNext} className="absolute right-6 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 hover:bg-[#00F2FF] hover:text-black transition-all z-10"><ChevronRight className="w-6 h-6" /></button>
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
-                    {project.images.map((_, i) => (
-                      <button key={i} onClick={() => setCurrentImageIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] w-8" : "bg-white/20 hover:bg-white/40"}`} />
-                    ))}
-                  </div>
+                  <button onClick={handlePrev} className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-[#00F2FF] border border-[#00F2FF]/30 hover:bg-[#00F2FF] hover:text-black transition-all"><ChevronLeft className="w-6 h-6" /></button>
+                  <button onClick={handleNext} className="absolute right-6 top-1/2 -translate-y-1/2 bg-black/60 p-3 rounded-full text-[#00F2FF] border border-[#00F2FF]/30 hover:bg-[#00F2FF] hover:text-black transition-all"><ChevronRight className="w-6 h-6" /></button>
                 </>
               )}
             </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#00F2FF]/20 font-mono text-sm tracking-widest uppercase">No Visual Data</div>
+            <div className="w-full h-full flex items-center justify-center opacity-20">
+               <span className="font-mono text-xs tracking-widest uppercase text-[#00F2FF]">No Simulation Data</span>
+            </div>
           )}
         </div>
 
-        {/* Right: Content Area */}
-        <div className="w-full md:w-2/5 p-8 md:p-12 overflow-y-auto flex flex-col">
+        {/* Right: Info Area */}
+        <div className="w-full md:w-2/5 p-8 md:p-10 flex flex-col overflow-y-auto">
           <div className="mb-8">
-            <span className="font-mono text-xs tracking-[0.3em] text-[#00F2FF]/60 uppercase mb-4 block">Case_Study_Details</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight bg-gradient-to-r from-white to-[#94A3B8] bg-clip-text text-transparent">{project.title}</h2>
+            <span className="font-mono text-[10px] tracking-[0.3em] text-[#00F2FF]/60 uppercase mb-2 block">PROJECT_ID_{idx + 1}</span>
+            <h2 className="text-3xl font-bold tracking-tight text-white mb-4 leading-tight">{project.title}</h2>
+            <div className="h-1 w-20 bg-gradient-to-r from-[#00F2FF] to-transparent rounded-full" />
           </div>
 
-          <div className="space-y-8 mb-12">
+          <div className="space-y-8 flex-grow">
             <div className="flex flex-col gap-2">
-              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">System Focus</span>
+              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">System Focus & Impact</span>
               <p className="text-sm text-white/70 leading-relaxed font-light">{project.focus}</p>
             </div>
-            
-            <div className="grid grid-cols-1 gap-6 pt-6 border-t border-white/5">
+
+            <div className="grid grid-cols-1 gap-6">
               <div className="flex flex-col gap-2">
-                <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">Mechanical Components</span>
-                <p className="text-sm text-white/60 leading-relaxed">{project.components}</p>
+                <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">Mechanical Infrastructure</span>
+                <p className="text-xs text-white/50 leading-relaxed">{project.components}</p>
               </div>
               <div className="flex flex-col gap-2">
-                <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">Automation Stack</span>
-                <p className="text-sm text-white/60 leading-relaxed">{project.automation}</p>
+                <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">Automation Strategy</span>
+                <p className="text-xs text-white/50 leading-relaxed">{project.automation}</p>
               </div>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="mt-auto space-y-4 pt-8 border-t border-white/5">
-            <button className="w-full flex items-center justify-between px-6 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-2xl hover:bg-[#00F2FF] hover:text-black transition-all group/zip">
-              <div className="flex items-center gap-4">
-                <Download className="w-5 h-5" />
-                <div className="text-left">
-                  <p className="font-mono text-xs font-bold uppercase tracking-widest">Project Assets</p>
-                  <p className="text-[10px] opacity-70 uppercase tracking-tighter">CAD + Renders (ZIP)</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-30 group-hover/zip:translate-x-1 transition-all" />
-            </button>
-
-            <button className="w-full flex items-center justify-between px-6 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/30 transition-all group/pdf">
-              <div className="flex items-center gap-4 text-white">
-                <FileText className="w-5 h-5" />
-                <div className="text-left">
-                  <p className="font-mono text-xs font-bold uppercase tracking-widest">Technical Reports</p>
-                  <p className="text-[10px] opacity-50 uppercase tracking-tighter">Engineering Documentation (PDF)</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 opacity-20 group-hover/pdf:translate-x-1 transition-all" />
-            </button>
+          <div className="mt-12 pt-8 border-t border-white/5 flex flex-col gap-3">
+             <button className="w-full group/btn relative overflow-hidden px-6 py-4 bg-[#00F2FF]/5 border border-[#00F2FF]/20 rounded-2xl transition-all hover:border-[#00F2FF]/50 hover:bg-[#00F2FF]/10">
+               <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 bg-black/40 rounded-xl border border-[#00F2FF]/10 text-[#00F2FF]">
+                       <FileBarChart className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                       <p className="font-mono text-xs text-white uppercase tracking-wider">Technical Package</p>
+                       <p className="font-mono text-[9px] text-[#00F2FF]/60 uppercase">ZIP: CAD + SIMULATION</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-[#00F2FF]/30 group-hover/btn:translate-x-1 transition-transform" />
+               </div>
+             </button>
+             <button className="w-full flex items-center justify-center gap-3 py-4 bg-[#00F2FF] text-black rounded-2xl text-xs font-mono tracking-[0.2em] uppercase font-bold hover:bg-[#00F2FF]/80 transition-all shadow-[0_0_30px_rgba(0,242,255,0.3)]">
+                <FileText className="w-5 h-5" /> View Engineering Report
+             </button>
           </div>
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
-function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: number; onOpen: () => void }) {
   return (
-    <>
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: idx * 0.1 }}
-        onClick={() => setIsModalOpen(true)}
-        className="group relative aspect-square bg-[#020617] border border-[#00F2FF]/10 rounded-2xl overflow-hidden cursor-pointer hover:border-[#00F2FF]/40 transition-all duration-500 shadow-xl"
-      >
-        {/* Background Render */}
-        <div className="absolute inset-0 z-0">
-          {project.images && project.images[0] ? (
-            <Image 
-              src={project.images[0]} 
-              alt={project.title} 
-              fill
-              className="object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-black/40">
-              <span className="font-mono text-[10px] text-[#00F2FF]/20 uppercase tracking-widest">No Visual</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: idx * 0.1 }}
+      className="group relative aspect-square bg-[#020617] border border-[#00F2FF]/10 rounded-2xl overflow-hidden cursor-pointer hover:border-[#00F2FF]/40 transition-all"
+      onClick={onOpen}
+    >
+      {project.images && project.images.length > 0 ? (
+        <Image 
+          src={project.images[0]} 
+          alt={project.title} 
+          width={400} 
+          height={400} 
+          className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center opacity-10">
+           <span className="font-mono text-[10px] uppercase text-[#00F2FF]">No Render</span>
         </div>
-
-        {/* Content Overlay */}
-        <div className="absolute inset-0 z-10 p-5 flex flex-col justify-end">
-          <span className="font-mono text-[9px] tracking-[0.3em] text-[#00F2FF]/60 uppercase mb-2">PROJ_{idx + 1}</span>
-          <h3 className="text-sm font-bold text-white mb-4 line-clamp-2 leading-snug group-hover:text-[#00F2FF] transition-colors">
-            {project.title}
-          </h3>
-          
-          <div className="flex items-center gap-2 text-[10px] font-mono text-[#00F2FF] uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-            View Project <Maximize2 className="w-3 h-3" />
-          </div>
+      )}
+      
+      {/* Hover Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#000814] via-[#000814]/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+      
+      <div className="absolute inset-0 p-6 flex flex-col justify-end">
+        <span className="font-mono text-[8px] tracking-[0.3em] text-[#00F2FF]/60 uppercase mb-2">PROJ_{idx + 1}</span>
+        <h3 className="text-sm font-bold text-white group-hover:text-[#00F2FF] transition-colors line-clamp-2">{project.title}</h3>
+        
+        <div className="mt-4 overflow-hidden h-0 group-hover:h-8 transition-all duration-300">
+           <div className="flex items-center gap-2 text-[9px] font-mono tracking-widest text-[#00F2FF] uppercase">
+             View Project <ChevronRight className="w-3 h-3" />
+           </div>
         </div>
-
-        {/* Hover Border Glow */}
-        <div className="absolute inset-0 border border-[#00F2FF]/0 group-hover:border-[#00F2FF]/40 transition-colors pointer-events-none rounded-2xl" />
-      </motion.div>
-
-      <AnimatePresence>
-        {isModalOpen && (
-          <ProjectModal 
-            project={project} 
-            onClose={() => setIsModalOpen(false)} 
-          />
-        )}
-      </AnimatePresence>
-    </>
+      </div>
+    </motion.div>
   );
 }
 
 export function CaseStudies() {
   const { projects } = useAdmin();
+  const [selectedProject, setSelectedProject] = useState<{ project: CaseProject, idx: number } | null>(null);
+
   const validProjects = projects.filter(p => p.title || p.focus || p.components || p.automation);
 
   return (
     <Section id="projects">
       <SectionHeading>Technical Case Studies</SectionHeading>
+      
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 relative">
           {validProjects.map((project, idx) => (
-            <ProjectCard key={project.id} project={project} idx={idx} />
+            <ProjectCard 
+              key={project.id} 
+              project={project} 
+              idx={idx} 
+              onOpen={() => setSelectedProject({ project, idx })} 
+            />
           ))}
           {validProjects.length === 0 && (
             <div className="col-span-full text-center py-24 font-mono text-[#94A3B8]/30 text-xs tracking-widest uppercase border border-dashed border-[#00F2FF]/10 rounded-2xl">
-              No case studies published.
+              No case studies published. Add projects via the Admin Dashboard.
             </div>
           )}
-        </div>
+      </div>
+
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectModal 
+            project={selectedProject.project} 
+            idx={selectedProject.idx} 
+            onClose={() => setSelectedProject(null)} 
+          />
+        )}
+      </AnimatePresence>
     </Section>
   );
 }

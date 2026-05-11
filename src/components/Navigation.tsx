@@ -29,7 +29,7 @@ export function Navigation() {
         scrolled ? "bg-background/80 backdrop-blur-md border-muted py-4" : "bg-transparent py-6"
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-5xl mx-auto flex items-center justify-between">
         {/* Logo / Identity */}
         <a href="#" className="flex items-center gap-3 group">
           <div className="w-8 h-8 rounded-full bg-heading flex items-center justify-center text-background font-bold text-sm overflow-hidden group-hover:scale-105 transition-transform">
