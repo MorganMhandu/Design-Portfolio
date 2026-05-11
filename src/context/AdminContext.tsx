@@ -65,6 +65,7 @@ export type Candidate = {
 export type AdminSettings = {
   profilePicture: string;
   showProfilePicture: boolean;
+  heroVideo?: string;
   contact: {
     phone: string;
     whatsapp: string;
@@ -145,6 +146,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<AdminSettings>({
     profilePicture: "",
     showProfilePicture: true,
+    heroVideo: "/assets/simulation-hero.mp4",
     contact: {
       phone: "+263 773 754 068",
       whatsapp: "https://wa.me/263773754068",

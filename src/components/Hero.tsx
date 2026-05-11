@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useAdmin } from "@/context/AdminContext";
+import { PlayCircle } from "lucide-react";
 
 function WireframeAssembly() {
   const { scrollY } = useScroll();
@@ -212,12 +213,36 @@ export function Hero() {
 
         {/* Right Column (40% width) - Graphic isolated entirely to this column */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 0.95 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="w-full lg:w-[40%] flex justify-center items-center relative aspect-square lg:aspect-auto lg:h-[480px] bg-white/5 border border-[#00F2FF]/20 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.05),0_0_40px_rgba(0,242,255,0.05)] backdrop-blur-md scale-90"
+          className="w-full lg:w-[35%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.1),0_0_40px_rgba(0,242,255,0.2)] backdrop-blur-md group"
         >
-          <WireframeAssembly />
+          {settings.heroVideo ? (
+            <div className="relative w-full h-full">
+              <video 
+                src={settings.heroVideo}
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+              />
+              {/* Technical HUD Overlay on Video */}
+              <div className="absolute inset-0 pointer-events-none border-[1px] border-[#00F2FF]/20 m-4 rounded-xl" />
+              <div className="absolute top-6 left-6 flex items-center gap-2 opacity-50">
+                <div className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse" />
+                <span className="font-mono text-[8px] text-[#00F2FF] tracking-[0.2em] uppercase">Sim_Active</span>
+              </div>
+              <div className="absolute bottom-6 right-6 opacity-30">
+                <PlayCircle className="w-6 h-6 text-[#00F2FF]" />
+              </div>
+              {/* Scanline Effect */}
+              <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_2px,3px_100%]" />
+            </div>
+          ) : (
+            <WireframeAssembly />
+          )}
         </motion.div>
 
       </div>

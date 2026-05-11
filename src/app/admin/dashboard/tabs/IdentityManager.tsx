@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAdmin } from "@/context/AdminContext";
-import { Upload, Trash2, Eye, EyeOff, User, Save } from "lucide-react";
+import { Upload, Trash2, Eye, EyeOff, User, Save, Film } from "lucide-react";
 import Image from "next/image";
 
 export function IdentityManager() {
@@ -11,14 +11,19 @@ export function IdentityManager() {
 
   const [draft, setDraft] = useState({ 
     profilePicture: settings.profilePicture, 
-    showProfilePicture: settings.showProfilePicture 
+    showProfilePicture: settings.showProfilePicture,
+    heroVideo: settings.heroVideo
   });
   const [dirty, setDirty] = useState(false);
   const [synced, setSynced] = useState(false);
 
   useEffect(() => {
-    if (!dirty) setDraft({ profilePicture: settings.profilePicture, showProfilePicture: settings.showProfilePicture });
-  }, [settings.profilePicture, settings.showProfilePicture, dirty]);
+    if (!dirty) setDraft({ 
+      profilePicture: settings.profilePicture, 
+      showProfilePicture: settings.showProfilePicture,
+      heroVideo: settings.heroVideo 
+    });
+  }, [settings.profilePicture, settings.showProfilePicture, settings.heroVideo, dirty]);
 
   const handleChange = (field: string, value: any) => {
     setDraft(prev => ({ ...prev, [field]: value }));
@@ -33,7 +38,7 @@ export function IdentityManager() {
     setTimeout(() => setSynced(false), 3000);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "profilePicture" | "heroVideo") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -48,7 +53,7 @@ export function IdentityManager() {
       });
       const data = await res.json();
       if (data.urls && data.urls.length > 0) {
-        handleChange("profilePicture", data.urls[0]);
+        handleChange(field, data.urls[0]);
       }
     } catch (error) {
       console.error("Upload failed:", error);
@@ -94,7 +99,7 @@ export function IdentityManager() {
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                   <label className="cursor-pointer p-3 rounded-full bg-[#00F2FF] text-black hover:scale-110 transition-transform">
                     <Upload className="w-5 h-5" />
-                    <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*" />
+                    <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, "profilePicture")} accept="image/*" />
                   </label>
                   <button 
                     onClick={() => handleChange("profilePicture", "")}
@@ -113,7 +118,7 @@ export function IdentityManager() {
                   <p className="font-mono text-[10px] text-[#00F2FF] tracking-widest uppercase mb-1">{uploading ? "Uploading..." : "Click to Upload"}</p>
                   <p className="font-mono text-[8px] text-[#94A3B8]/40 tracking-widest uppercase">Target: Hero_Section</p>
                 </div>
-                <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*" />
+                <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, "profilePicture")} accept="image/*" />
               </label>
             )}
           </div>
@@ -121,6 +126,56 @@ export function IdentityManager() {
           <div className="p-4 border border-white/5 rounded-xl bg-black/20">
             <p className="font-mono text-[9px] text-[#94A3B8]/60 leading-relaxed">
               Recommended: 1000x1000px min, high-contrast engineering aesthetic. Images are automatically stored in /assets/ with absolute path resolution.
+            </p>
+          </div>
+        </div>
+
+        {/* Hero Video Management */}
+        <div className="p-8 border border-[#00F2FF]/20 rounded-2xl bg-[#00F2FF]/5 flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-mono text-sm font-bold text-[#00F2FF] tracking-widest uppercase">Hero Simulation Video</h3>
+          </div>
+
+          <div className="relative aspect-video w-full rounded-2xl border-2 border-dashed border-[#00F2FF]/20 overflow-hidden group">
+            {draft.heroVideo ? (
+              <>
+                <video 
+                  src={draft.heroVideo} 
+                  autoPlay 
+                  loop 
+                  muted 
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                  <label className="cursor-pointer p-3 rounded-full bg-[#00F2FF] text-black hover:scale-110 transition-transform">
+                    <Upload className="w-5 h-5" />
+                    <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, "heroVideo")} accept="video/*" />
+                  </label>
+                  <button 
+                    onClick={() => handleChange("heroVideo", "")}
+                    className="p-3 rounded-full bg-red-500 text-white hover:scale-110 transition-transform"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <label className="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer hover:bg-[#00F2FF]/5 transition-colors">
+                <div className="w-16 h-16 rounded-full bg-[#00F2FF]/10 flex items-center justify-center text-[#00F2FF]/40 border border-[#00F2FF]/20">
+                  <Film className="w-8 h-8" />
+                </div>
+                <div className="text-center">
+                  <p className="font-mono text-[10px] text-[#00F2FF] tracking-widest uppercase mb-1">{uploading ? "Uploading..." : "Click to Upload Video"}</p>
+                  <p className="font-mono text-[8px] text-[#94A3B8]/40 tracking-widest uppercase">Target: Hero_Graphic</p>
+                </div>
+                <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, "heroVideo")} accept="video/*" />
+              </label>
+            )}
+          </div>
+
+          <div className="p-4 border border-white/5 rounded-xl bg-black/20">
+            <p className="font-mono text-[9px] text-[#94A3B8]/60 leading-relaxed">
+              Recommended: MP4 format, loop-friendly simulation or CAD render. Keep file size under 50MB for optimal performance.
             </p>
           </div>
         </div>
