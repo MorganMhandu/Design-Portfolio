@@ -109,8 +109,8 @@ export function Hero() {
       {/* Container: Splits layout into 60/40 */}
       <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-[1400px] z-10 gap-8 lg:gap-4">
         
-        {/* Left Column (60% width) */}
-        <div className="w-full lg:w-[60%] flex flex-col items-start justify-center pt-8 lg:pt-0">
+        {/* Left Column (55% width) */}
+        <div className="w-full lg:w-[55%] flex flex-col items-start justify-center pt-8 lg:pt-0">
           
           {/* Biometric ID / Headshot Section */}
           <motion.div
@@ -216,7 +216,7 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="w-full lg:w-[48%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.1),0_0_40px_rgba(0,242,255,0.2)] backdrop-blur-md group"
+          className="w-full lg:w-[40%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.1),0_0_40px_rgba(0,242,255,0.2)] backdrop-blur-md group"
         >
           {settings.heroVideo ? (
             <div className="relative w-full h-full">
