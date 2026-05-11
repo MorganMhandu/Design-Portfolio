@@ -29,10 +29,10 @@ function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
   };
 
   return (
-    <div className="relative flex flex-col border border-[#00F2FF]/10 bg-[#020617]/60 backdrop-blur-md rounded-2xl hover:border-[#00F2FF]/40 transition-all duration-500 group overflow-hidden">
+    <div className="relative flex flex-col border border-[#00F2FF]/10 bg-[#020617]/80 backdrop-blur-md rounded-2xl hover:border-[#00F2FF]/40 transition-all duration-500 group overflow-hidden shadow-2xl">
       
       {/* 1. VISUAL LAYER (Carousel) */}
-      <div className="relative w-full h-[220px] bg-[#000814] overflow-hidden group/carousel">
+      <div className="relative w-full h-[300px] bg-[#000814] overflow-hidden group/carousel">
         {project.images && project.images.length > 0 ? (
           <>
             <div className="relative w-full h-full flex items-center justify-center cursor-pointer" onClick={() => setIsLightboxOpen(true)}>
@@ -41,7 +41,7 @@ function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
                 alt={`${project.title} - Render ${currentImageIndex + 1}`} 
                 width={800} 
                 height={600} 
-                className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
+                className="w-full h-full object-contain opacity-100 transition-all duration-700 group-hover:scale-105"
                 priority={idx < 2}
                 key={`${project.id}-${currentImageIndex}`}
               />
@@ -49,11 +49,11 @@ function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
             
             {project.images.length > 1 && (
               <>
-                <button onClick={handlePrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 p-1.5 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronLeft className="w-4 h-4" /></button>
-                <button onClick={handleNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 p-1.5 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronRight className="w-4 h-4" /></button>
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                <button onClick={handlePrev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 p-2 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronLeft className="w-5 h-5" /></button>
+                <button onClick={handleNext} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 p-2 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronRight className="w-5 h-5" /></button>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                   {project.images.map((_, i) => (
-                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }} className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] w-3" : "bg-white/10 hover:bg-white/30"}`} />
+                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }} className={`w-2 h-2 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] w-4" : "bg-white/20 hover:bg-white/40"}`} />
                   ))}
                 </div>
               </>
@@ -61,64 +61,64 @@ function ProjectCard({ project, idx }: { project: CaseProject; idx: number }) {
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-[#020617]/50">
-             <span className="font-mono text-[8px] text-[#00F2FF]/30 tracking-widest uppercase">No Visual Data</span>
+             <span className="font-mono text-xs text-[#00F2FF]/30 tracking-widest uppercase">No Visual Data</span>
           </div>
         )}
       </div>
 
       {/* 2. CONTENT LAYER */}
-      <div className="p-5 flex flex-col flex-grow">
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="text-lg font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300">
+      <div className="p-6 flex flex-col flex-grow">
+        <div className="flex items-start justify-between mb-4">
+          <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300">
             {project.title}
           </h3>
-          <span className="font-mono text-[8px] tracking-[0.2em] text-[#00F2FF]/40 uppercase mt-1">ID_{idx + 1}</span>
+          <span className="font-mono text-[10px] tracking-[0.2em] text-[#00F2FF]/40 uppercase mt-1">PROJ_{idx + 1}</span>
         </div>
 
-        <div className="space-y-3 mb-6">
-          <div className="flex flex-col gap-0.5">
-            <span className="font-mono text-[8px] tracking-widest text-[#00F2FF]/40 uppercase">System Focus</span>
-            <p className="text-[11px] text-white/60 leading-relaxed font-light line-clamp-2">{project.focus}</p>
+        <div className="space-y-4 mb-8">
+          <div className="flex flex-col gap-1">
+            <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 uppercase">System Focus</span>
+            <p className="text-sm text-white/70 leading-relaxed font-light line-clamp-2">{project.focus}</p>
           </div>
           
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[8px] tracking-widest text-[#00F2FF]/30 uppercase">Mechanics</span>
-              <p className="text-[9px] text-white/40 leading-tight truncate">{project.components}</p>
+          <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/5">
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">Mechanics</span>
+              <p className="text-xs text-white/50 leading-tight truncate">{project.components}</p>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="font-mono text-[8px] tracking-widest text-[#00F2FF]/30 uppercase">Automation</span>
-              <p className="text-[9px] text-white/40 leading-tight truncate">{project.automation}</p>
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-[10px] tracking-widest text-[#00F2FF]/40 uppercase">Automation</span>
+              <p className="text-xs text-white/50 leading-tight truncate">{project.automation}</p>
             </div>
           </div>
         </div>
 
         {/* 3. REFINED ACTION BAY */}
-        <div className="mt-auto flex flex-col gap-2">
-          <button className="w-full flex items-center justify-between px-4 py-3 bg-[#00F2FF]/5 border border-[#00F2FF]/10 rounded-xl hover:bg-[#00F2FF]/10 hover:border-[#00F2FF]/30 transition-all group/btn">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-black/30 rounded-lg text-[#00F2FF] border border-[#00F2FF]/10">
-                <X className="w-3.5 h-3.5 rotate-45" /> {/* Generic ZIP icon substitute */}
+        <div className="mt-auto flex flex-col gap-3">
+          <button className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/5 border border-[#00F2FF]/10 rounded-xl hover:bg-[#00F2FF]/10 hover:border-[#00F2FF]/30 transition-all group/btn">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 bg-black/30 rounded-lg text-[#00F2FF] border border-[#00F2FF]/10">
+                <FileBarChart className="w-4 h-4" />
               </div>
               <div className="text-left">
-                <p className="font-mono text-[9px] text-white tracking-widest uppercase">Technical Assets</p>
-                <p className="font-mono text-[7px] text-[#00F2FF]/50 uppercase">Download ZIP Package</p>
+                <p className="font-mono text-xs text-white tracking-widest uppercase">Technical Assets</p>
+                <p className="font-mono text-[9px] text-[#00F2FF]/50 uppercase">Download ZIP Package</p>
               </div>
             </div>
-            <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover/btn:translate-x-1 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-white/20 group-hover/btn:translate-x-1 transition-transform" />
           </button>
 
-          <button className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
-                <FileText className="w-3.5 h-3.5" />
+          <button className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf">
+            <div className="flex items-center gap-4">
+              <div className="p-2.5 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
+                <FileText className="w-4 h-4" />
               </div>
               <div className="text-left">
-                <p className="font-mono text-[9px] tracking-widest uppercase">Engineering Reports</p>
-                <p className="font-mono text-[7px] opacity-60 uppercase">View Technical PDF</p>
+                <p className="font-mono text-xs tracking-widest uppercase">Engineering Reports</p>
+                <p className="font-mono text-[9px] opacity-60 uppercase">View Technical PDF</p>
               </div>
             </div>
-            <ChevronRight className="w-3.5 h-3.5 opacity-20 group-hover/pdf:translate-x-1 transition-transform" />
+            <ChevronRight className="w-4 h-4 opacity-20 group-hover/pdf:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>
@@ -158,7 +158,7 @@ export function CaseStudies() {
   return (
     <Section id="projects">
       <SectionHeading>Technical Case Studies</SectionHeading>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 relative">
           {validProjects.map((project, idx) => (
             <ProjectCard key={project.id} project={project} idx={idx} />
           ))}
