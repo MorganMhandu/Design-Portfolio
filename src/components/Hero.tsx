@@ -100,17 +100,17 @@ export function Hero() {
   }, [settings.profilePicture]);
 
   return (
-    <section className="relative h-[100vh] w-full overflow-hidden flex items-center justify-center py-[6vh] px-[10%] bg-[#020617]">
+    <section className="relative min-h-[100vh] w-full overflow-hidden flex items-center justify-center py-20 px-8 md:px-12 bg-[#020617]">
       
       {/* --- ATMOSPHERIC LIGHTING (DARK MODE PLUS) --- */}
       <div className="absolute top-0 right-0 w-[70vw] h-[70vw] bg-[radial-gradient(circle_at_center,_rgba(41,121,255,0.15)_0%,_transparent_60%)] -z-10 translate-x-1/4 -translate-y-1/4" />
       <div className="absolute bottom-0 left-0 w-[50vw] h-[50vw] bg-[radial-gradient(circle_at_center,_rgba(41,121,255,0.10)_0%,_transparent_60%)] -z-10 -translate-x-1/4 translate-y-1/4" />
 
-      {/* Container: Splits layout into 60/40 */}
-      <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-[1400px] z-10 gap-8 lg:gap-4">
+      {/* Container: Splits layout into balanced columns */}
+      <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-7xl z-10 gap-16 lg:gap-24">
         
-        {/* Left Column (55% width) */}
-        <div className="w-full lg:w-[55%] flex flex-col items-start justify-center pt-8 lg:pt-0">
+        {/* Left Column (Content) */}
+        <div className="w-full lg:w-1/2 flex flex-col items-start justify-center">
           
           {/* Biometric ID / Headshot Section */}
           <motion.div
@@ -165,7 +165,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="font-bold leading-[1.05] tracking-tighter mb-4 drop-shadow-lg"
             style={{ 
-              fontSize: "4rem",
+              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
               backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 50%, #78909C 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent"
@@ -211,12 +211,12 @@ export function Hero() {
 
         </div>
 
-        {/* Right Column (40% width) - Graphic isolated entirely to this column */}
+        {/* Right Column (Video) */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="w-full lg:w-[40%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.1),0_0_40px_rgba(0,242,255,0.2)] backdrop-blur-md group"
+          className="w-full lg:w-1/2 flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.1),0_0_40px_rgba(0,242,255,0.2)] backdrop-blur-md group"
         >
           {settings.heroVideo ? (
             <div className="relative w-full h-full">
