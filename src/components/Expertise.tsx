@@ -46,7 +46,7 @@ export function Expertise() {
       <div className="flex flex-col mb-4">
         <SectionHeading>Technical Capabilities</SectionHeading>
       </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
           {pillars.map((cap, idx) => (
             <div key={cap.id} className="flex flex-col relative group overflow-visible rounded-2xl border border-[#00F2FF]/40 bg-[#020617]/80 backdrop-blur-md p-5 lg:p-5 pb-10 transition-all duration-500 hover:scale-[1.02] hover:border-[#00F2FF]/80 hover:shadow-[0_0_30px_rgba(0,242,255,0.15),inset_0_0_20px_rgba(0,242,255,0.05)] cursor-default h-auto">
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#00F2FF05_1px,transparent_1px),linear-gradient(to_bottom,#00F2FF05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-500 z-0" />
