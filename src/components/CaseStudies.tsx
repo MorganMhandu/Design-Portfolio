@@ -146,7 +146,7 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
         <h3 className="text-sm font-bold text-white group-hover:text-[#00F2FF] transition-colors line-clamp-2">{project.title}</h3>
         
         <div className="mt-4 overflow-hidden h-0 group-hover:h-8 transition-all duration-300">
-           <div className="flex items-center gap-2 text-[9px] font-mono tracking-widest text-[#00F2FF] uppercase">
+           <div className="flex items-center gap-2 text-[11px] font-mono tracking-widest text-[#00F2FF] uppercase">
              View Project <ChevronRight className="w-3 h-3" />
            </div>
         </div>

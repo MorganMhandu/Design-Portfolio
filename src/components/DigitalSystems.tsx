@@ -90,7 +90,7 @@ function SystemCard({ system, idx, onOpen }: { system: DigitalSystem; idx: numbe
       <div className="absolute inset-0 bg-gradient-to-t from-[#00F2FF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       
       <div className="absolute bottom-4 left-0 right-0 overflow-hidden h-0 group-hover:h-6 transition-all duration-300">
-         <span className="text-[8px] font-mono tracking-[0.2em] text-[#00F2FF] uppercase">System Overview</span>
+         <span className="text-[10px] font-mono tracking-[0.2em] text-[#00F2FF] uppercase">System Overview</span>
       </div>
     </motion.div>
   );
