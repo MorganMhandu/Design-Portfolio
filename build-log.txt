@@ -1,0 +1,28 @@
+
+> portfolio@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.3
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+Error: supabaseUrl is required.
+    at C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\chunks\890.js:48:51291
+    at new rW (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\chunks\890.js:48:51542)
+    at rK (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\chunks\890.js:48:55329)
+    at 7670 (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\app\api\admin\data\route.js:1:827)
+    at t (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\webpack-runtime.js:1:127)
+    at r (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\app\api\admin\data\route.js:1:3011)
+    at C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\app\api\admin\data\route.js:1:3042
+    at t.X (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\webpack-runtime.js:1:1191)
+    at C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\app\api\admin\data\route.js:1:3024
+    at Object.<anonymous> (C:\Users\user\.gemini\antigravity\scratch\portfolio\.next\server\app\api\admin\data\route.js:1:3069)
+
+> Build error occurred
+Error: Failed to collect page data for /api/admin/data
+    at C:\Users\user\.gemini\antigravity\scratch\portfolio\node_modules\next\dist\build\utils.js:1268:15
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  type: 'Error'
+}

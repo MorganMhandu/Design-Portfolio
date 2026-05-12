@@ -5,17 +5,20 @@ import path from "path";
 
 export const dynamic = "force-dynamic";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-assets";
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-});
+let supabase: ReturnType<typeof createClient> | null = null;
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+}
 
 export async function GET() {
   try {
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabase || !supabaseUrl || !supabaseKey) {
       // Fallback to local DB if Supabase isn't configured yet
       const DB_PATH = path.join(process.cwd(), "src/data/db.json");
       const data = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
@@ -56,7 +59,7 @@ export async function POST(request: Request) {
   try {
     const newData = await request.json();
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabase || !supabaseUrl || !supabaseKey) {
       // Fallback to local DB
       const DB_PATH = path.join(process.cwd(), "src/data/db.json");
       fs.writeFileSync(DB_PATH, JSON.stringify(newData, null, 2), "utf8");

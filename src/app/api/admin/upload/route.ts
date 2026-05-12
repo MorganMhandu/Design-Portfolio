@@ -2,14 +2,16 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 // Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-// Prioritize Service Role Key for elevated backend access, fallback to Anon Key if necessary
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-assets";
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-});
+let supabase: ReturnType<typeof createClient> | null = null;
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
     }
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabase || !supabaseUrl || !supabaseKey) {
       return NextResponse.json({ error: "Supabase credentials missing from environment" }, { status: 500 });
     }
 
