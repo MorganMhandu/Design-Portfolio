@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Section, SectionHeading } from "./Section";
 import { Code, LayoutTemplate, X, ChevronRight, Laptop, Cpu, Globe } from "lucide-react";
