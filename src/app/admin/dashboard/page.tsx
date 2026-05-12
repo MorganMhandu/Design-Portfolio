@@ -6,7 +6,6 @@ import { FolderKanban, LayoutGrid, FileArchive, MessageSquare, LogOut, ChevronRi
 import { ProjectManager } from "./tabs/ProjectManager";
 import { CapabilityMatrix } from "./tabs/CapabilityMatrix";
 import { SystemGrid } from "./tabs/SystemGrid";
-import { DossierVault } from "./tabs/DossierVault";
 import { InquiryLog } from "./tabs/InquiryLog";
 import { IdentityManager } from "./tabs/IdentityManager";
 import { ContactController } from "./tabs/ContactController";
@@ -14,13 +13,12 @@ import { useAdmin } from "@/context/AdminContext";
 
 const SESSION_DURATION_MS = 30 * 60 * 1000;
 
-type TabId = "projects" | "capabilities" | "systems" | "dossier" | "inquiries" | "identity" | "contact";
+type TabId = "projects" | "capabilities" | "systems" | "inquiries" | "identity" | "contact";
 
 const TABS: { id: TabId; label: string; sublabel: string; icon: React.ElementType }[] = [
   { id: "projects", label: "Project Manager", sublabel: "Technical Case Studies", icon: FolderKanban },
   { id: "capabilities", label: "Capability Matrix", sublabel: "Skill Pillars", icon: LayoutGrid },
   { id: "systems", label: "Digital Asset Manager", sublabel: "Web & Digital Infrastructure", icon: Cpu },
-  { id: "dossier", label: "Dossier Vault", sublabel: "Engineering Reports", icon: FileArchive },
   { id: "inquiries", label: "Inquiry Log", sublabel: "Engage Terminal Messages", icon: MessageSquare },
   { id: "identity", label: "Identity Assets", sublabel: "Profile & Media", icon: UserCircle },
   { id: "contact", label: "Contact Controller", sublabel: "Public Data Management", icon: Smartphone },
@@ -87,7 +85,6 @@ export default function DashboardPage() {
       case "projects": return <ProjectManager />;
       case "capabilities": return <CapabilityMatrix />;
       case "systems": return <SystemGrid />;
-      case "dossier": return <DossierVault />;
       case "inquiries": return <InquiryLog />;
       case "identity": return <IdentityManager />;
       case "contact": return <ContactController />;

@@ -103,7 +103,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 
             {/* Action Bay */}
             <div className="mt-auto flex flex-col gap-3">
-              {project.zipUrl && (
+              {project.zipUrl && project.zipUrl.startsWith("http") || project.zipUrl?.startsWith("data:") ? (
                 <a 
                   href={project.zipUrl} 
                   target="_blank" 
@@ -122,14 +122,13 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                   </div>
                   <ChevronRight className="w-5 h-5 text-white/40 group-hover/btn:translate-x-1 transition-transform" />
                 </a>
-              )}
+              ) : null}
 
-              {project.pdfUrl && (
+              {project.pdfUrl && project.pdfUrl.startsWith("http") || project.pdfUrl?.startsWith("data:") ? (
                 <a 
                   href={project.pdfUrl} 
                   target="_blank" 
                   rel="noreferrer"
-                  download
                   className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf"
                 >
                   <div className="flex items-center gap-4">
@@ -143,7 +142,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                   </div>
                   <ChevronRight className="w-5 h-5 opacity-40 group-hover/pdf:translate-x-1 transition-transform" />
                 </a>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
