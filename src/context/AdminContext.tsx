@@ -54,16 +54,6 @@ export type DigitalSystem = {
   version: string;
 };
 
-export type Candidate = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  cvUrl: string;
-  timestamp: string;
-  status: "Pending" | "Reviewed" | "Rejected" | "Interviewing";
-};
-
 export type AdminSettings = {
   profilePicture: string;
   showProfilePicture: boolean;
@@ -76,53 +66,87 @@ export type AdminSettings = {
   };
 };
 
+// ─── Default State ────────────────────────────────────────────────────────────
+
+const DEFAULT_PILLARS: Pillar[] = [
+  { id: "pillar-1", title: "Mechanical Design & Simulation", iconName: "Hexagon", bullets: ["Precision Assembly Modeling", "Structural Integrity & FEA", "Advanced GD&T", "High-Fidelity Visualization (Blender/Lumion)"] },
+  { id: "pillar-2", title: "Automation & Control Systems", iconName: "Cpu", bullets: ["Mechatronic Integration", "PLC Logic & Smart Monitoring", "Fluid Power & Slurry Transport", "Equipment health tracking"] },
+  { id: "pillar-3", title: "Plant Engineering & Maintenance", iconName: "Wrench", bullets: ["Reliability Centered Maintenance (RCM)", "Root Cause Analysis (RCA)", "Asset Lifecycle Management", "Process Optimization"] },
+  { id: "pillar-4", title: "Manufacturing & Production", iconName: "Crosshair", bullets: ["Design for Manufacturing (DFM/CNC)", "SHEQ & ISO Compliance", "Specialized Tooling & Jigs", "Material Science"] },
+  { id: "pillar-5", title: "Digital & Web Engineering", iconName: "Code", bullets: ["Engineering Dashboards (Next.js/Tailwind)", "Full-Stack Technical Tooling", "Interactive 3D UI", "Agile Documentation"] },
+];
+
+const DEFAULT_SYSTEMS: DigitalSystem[] = [
+  { id: "sys-1", title: "Interactive Engineering Visualizer", techStack: ["Next.js", "Framer Motion"], description: "A platform for real-time 3D technical visualization. Engineered to bridge the gap between heavy CAD documentation and accessible web-based portfolio demonstrations.", link: "#", version: "V1.0" },
+];
+
+const DEFAULT_SETTINGS: AdminSettings = {
+  profilePicture: "",
+  showProfilePicture: true,
+  heroVideo: "/assets/simulation-hero.mp4",
+  contact: {
+    phone: "+263 773 745 068",
+    whatsapp: "https://wa.me/263773745068",
+    email: "morganmichaelmhandu@gmail.com",
+    location: "Harare, Zimbabwe",
+  },
+};
+
+const STORAGE_KEY = "portfolio_admin_data";
+
+function loadFromStorage() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveToStorage(data: any) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn("localStorage save failed:", e);
+  }
+}
+
 // ─── Context Shape ────────────────────────────────────────────────────────────
 
 type AdminContextType = {
   syncStatus: "idle" | "syncing" | "success" | "error";
-  
-  // Projects
+
   projects: CaseProject[];
   addProject: (p: Omit<CaseProject, "id">) => void;
   editProject: (id: string, p: Partial<CaseProject>) => void;
   deleteProject: (id: string) => void;
 
-  // Pillars
   pillars: Pillar[];
   addPillar: (p: Omit<Pillar, "id">) => void;
   editPillar: (id: string, p: Partial<Pillar>) => void;
   deletePillar: (id: string) => void;
 
-  // Reports
   reports: Report[];
   addReport: (r: Omit<Report, "id">) => void;
   editReport: (id: string, r: Partial<Report>) => void;
   deleteReport: (id: string) => void;
 
-  // Messages
   messages: Message[];
   addMessage: (m: Omit<Message, "id" | "timestamp" | "read">) => void;
   markRead: (id: string) => void;
   deleteMessage: (id: string) => void;
 
-  // Digital Systems
   systems: DigitalSystem[];
   addSystem: (s: Omit<DigitalSystem, "id">) => void;
   editSystem: (id: string, s: Partial<DigitalSystem>) => void;
   deleteSystem: (id: string) => void;
 
-  // Candidates
-  candidates: Candidate[];
-  addCandidate: (c: Omit<Candidate, "id" | "timestamp" | "status">) => void;
-  updateCandidateStatus: (id: string, status: Candidate["status"]) => void;
-  deleteCandidate: (id: string) => void;
-
-  // Settings
   settings: AdminSettings;
   updateSettings: (s: Partial<AdminSettings>) => void;
 };
-
-// ─── Context Creation ─────────────────────────────────────────────────────────
 
 const AdminContext = createContext<AdminContextType | null>(null);
 
@@ -132,80 +156,102 @@ export function useAdmin() {
   return ctx;
 }
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
 function uid() {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<CaseProject[]>([]);
-  const [pillars, setPillars] = useState<Pillar[]>([]);
+  const [pillars, setPillars] = useState<Pillar[]>(DEFAULT_PILLARS);
   const [reports, setReports] = useState<Report[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [systems, setSystems] = useState<DigitalSystem[]>([]);
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [settings, setSettings] = useState<AdminSettings>({
-    profilePicture: "",
-    showProfilePicture: true,
-    heroVideo: "/assets/simulation-hero.mp4",
-    contact: {
-      phone: "+263 773 754 068",
-      whatsapp: "https://wa.me/263773754068",
-      email: "morganmichaelmhandu@gmail.com",
-      location: "Harare, Zimbabwe",
-    },
-  });
+  const [systems, setSystems] = useState<DigitalSystem[]>(DEFAULT_SYSTEMS);
+  const [settings, setSettings] = useState<AdminSettings>(DEFAULT_SETTINGS);
   const [syncStatus, setSyncStatus] = useState<AdminContextType["syncStatus"]>("idle");
+  const [initialized, setInitialized] = useState(false);
 
-  // Load Initial Data
+  // ── 1. Load from localStorage first (instant, no flicker) ──
   useEffect(() => {
-    fetch("/api/admin/data")
-      .then(res => res.json())
-      .then(data => {
-        if (data.projects) setProjects(data.projects);
-        if (data.pillars) setPillars(data.pillars);
-        if (data.reports) setReports(data.reports);
-        if (data.messages) setMessages(data.messages);
-        if (data.systems) setSystems(data.systems);
-        if (data.candidates) setCandidates(data.candidates);
-        if (data.settings) setSettings(data.settings);
-      })
-      .catch(err => console.error("Failed to load data:", err));
+    const local = loadFromStorage();
+    if (local) {
+      if (local.projects) setProjects(local.projects);
+      if (local.pillars) setPillars(local.pillars);
+      if (local.reports) setReports(local.reports);
+      if (local.messages) setMessages(local.messages);
+      if (local.systems) setSystems(local.systems);
+      if (local.settings) setSettings(local.settings);
+    }
+    setInitialized(true);
   }, []);
 
-  // Sync Data Helper
-  const syncData = useCallback(async (overrides: any = {}) => {
-    setSyncStatus("syncing");
-    
-    // We need to get the latest state or use overrides
-    // Since useState is async, overrides are crucial for immediate updates
-    const fullState = {
-      projects: overrides.projects !== undefined ? overrides.projects : projects,
-      pillars: overrides.pillars !== undefined ? overrides.pillars : pillars,
-      reports: overrides.reports !== undefined ? overrides.reports : reports,
-      messages: overrides.messages !== undefined ? overrides.messages : messages,
-      systems: overrides.systems !== undefined ? overrides.systems : systems,
-      candidates: overrides.candidates !== undefined ? overrides.candidates : candidates,
-      settings: overrides.settings !== undefined ? overrides.settings : settings,
-    };
-
-    try {
-      const res = await fetch("/api/admin/data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fullState),
+  // ── 2. After local load, try to sync from Supabase cloud (if configured) ──
+  useEffect(() => {
+    if (!initialized) return;
+    fetch("/api/admin/data")
+      .then((res) => res.json())
+      .then((data) => {
+        // Only accept cloud data if it actually has content
+        if (data && !data.error) {
+          if (data.projects?.length) setProjects(data.projects);
+          if (data.pillars?.length) setPillars(data.pillars);
+          if (data.reports?.length) setReports(data.reports);
+          if (data.messages?.length) setMessages(data.messages);
+          if (data.systems?.length) setSystems(data.systems);
+          if (data.settings) setSettings(data.settings);
+          // Update localStorage with cloud data
+          saveToStorage(data);
+        }
+      })
+      .catch(() => {
+        // Cloud unavailable — localStorage is the source of truth
+        console.warn("Cloud sync unavailable. Using local data.");
       });
-      if (res.ok) {
-        setSyncStatus("success");
-        setTimeout(() => setSyncStatus("idle"), 3000);
-      } else {
-        setSyncStatus("error");
+  }, [initialized]);
+
+  // ── Sync Helper: saves to localStorage immediately, then tries cloud ──
+  const syncData = useCallback(
+    async (overrides: Partial<{
+      projects: CaseProject[];
+      pillars: Pillar[];
+      reports: Report[];
+      messages: Message[];
+      systems: DigitalSystem[];
+      settings: AdminSettings;
+    }> = {}) => {
+      const fullState = {
+        projects: overrides.projects ?? projects,
+        pillars: overrides.pillars ?? pillars,
+        reports: overrides.reports ?? reports,
+        messages: overrides.messages ?? messages,
+        systems: overrides.systems ?? systems,
+        settings: overrides.settings ?? settings,
+      };
+
+      // Always save to localStorage first
+      saveToStorage(fullState);
+
+      // Then try cloud sync
+      setSyncStatus("syncing");
+      try {
+        const res = await fetch("/api/admin/data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fullState),
+        });
+        if (res.ok) {
+          setSyncStatus("success");
+          setTimeout(() => setSyncStatus("idle"), 3000);
+        } else {
+          setSyncStatus("idle"); // Not an error — local save succeeded
+        }
+      } catch {
+        setSyncStatus("idle"); // Cloud sync failed but local save succeeded
       }
-    } catch (err) {
-      setSyncStatus("error");
-    }
-  }, [projects, pillars, reports, messages, systems, candidates, settings]);
+    },
+    [projects, pillars, reports, messages, systems, settings]
+  );
 
   // ── Projects ──
   const addProject = useCallback((p: Omit<CaseProject, "id">) => {
@@ -305,28 +351,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     syncData({ systems: newList });
   }, [systems, syncData]);
 
-  // ── Candidates ──
-  const addCandidate = useCallback((c: Omit<Candidate, "id" | "timestamp" | "status">) => {
-    const newList: Candidate[] = [
-      { ...c, id: uid(), timestamp: new Date().toISOString(), status: "Pending" },
-      ...candidates,
-    ];
-    setCandidates(newList);
-    syncData({ candidates: newList });
-  }, [candidates, syncData]);
-
-  const updateCandidateStatus = useCallback((id: string, status: Candidate["status"]) => {
-    const newList = candidates.map((x) => (x.id === id ? { ...x, status } : x));
-    setCandidates(newList);
-    syncData({ candidates: newList });
-  }, [candidates, syncData]);
-
-  const deleteCandidate = useCallback((id: string) => {
-    const newList = candidates.filter((x) => x.id !== id);
-    setCandidates(newList);
-    syncData({ candidates: newList });
-  }, [candidates, syncData]);
-
   // ── Settings ──
   const updateSettings = useCallback((s: Partial<AdminSettings>) => {
     const newSettings = { ...settings, ...s };
@@ -343,7 +367,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         reports, addReport, editReport, deleteReport,
         messages, addMessage, markRead, deleteMessage,
         systems, addSystem, editSystem, deleteSystem,
-        candidates, addCandidate, updateCandidateStatus, deleteCandidate,
         settings, updateSettings,
       }}
     >

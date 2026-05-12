@@ -61,42 +61,56 @@ function ProjectForm({
     setForm((prev) => ({ ...prev, [key]: val }));
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "zipUrl" | "pdfUrl") => {
-    if (e.target.files && e.target.files.length > 0) {
-      setIsUploading(true);
-      setUploadStatus(`Uploading ${field}...`);
-      const formData = new FormData();
-      
-      if (field === "images") {
-        Array.from(e.target.files).forEach(file => {
-          formData.append("files", file);
-        });
-        formData.append("folder", "portfolio/projects/renders");
-      } else {
-        formData.append("files", e.target.files[0]);
-        formData.append("folder", field === "zipUrl" ? "portfolio/projects/zip" : "portfolio/projects/pdf");
-      }
+    if (!e.target.files || e.target.files.length === 0) return;
 
-      try {
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        if (data.urls) {
-          if (field === "images") {
-            set("images", [...form.images, ...data.urls]);
-          } else {
-            set(field, data.urls[0]);
-          }
+    setIsUploading(true);
+    setUploadStatus(`Uploading ${field}...`);
+
+    const files = Array.from(e.target.files);
+
+    try {
+      // First, try the cloud upload API
+      const formData = new FormData();
+      files.forEach(file => formData.append("files", file));
+      formData.append("folder", field === "images" ? "portfolio/projects/renders" : field === "zipUrl" ? "portfolio/projects/zip" : "portfolio/projects/pdf");
+
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (res.ok && data.urls) {
+        // Cloud upload success
+        if (field === "images") {
+          set("images", [...form.images, ...data.urls]);
+        } else {
+          set(field, data.urls[0]);
         }
-      } catch (err) {
-        console.error("Upload failed:", err);
-        alert("Upload failed. Please try again.");
-      } finally {
-        setIsUploading(false);
         setUploadStatus(null);
+        setIsUploading(false);
+        return;
       }
+    } catch {
+      // Cloud unavailable — fall through to local base64 fallback
     }
+
+    // Fallback: convert to base64 data URLs (works without Supabase)
+    if (field === "images") {
+      const base64Urls: string[] = [];
+      for (const file of files) {
+        const b64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+        base64Urls.push(b64);
+      }
+      set("images", [...form.images, ...base64Urls]);
+    } else {
+      // For ZIP/PDF, store the filename as a reference (can't embed large binary in localStorage)
+      set(field, `[local] ${files[0].name}`);
+    }
+
+    setIsUploading(false);
+    setUploadStatus(null);
   };
 
   const removeImage = (idx: number) =>
