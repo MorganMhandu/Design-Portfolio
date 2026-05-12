@@ -107,7 +107,8 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                 <a 
                   href={project.zipUrl} 
                   target="_blank" 
-                  rel="noreferrer" 
+                  rel="noreferrer"
+                  download
                   className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-xl hover:bg-[#00F2FF]/20 transition-all group/btn"
                 >
                   <div className="flex items-center gap-4">
@@ -127,7 +128,8 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                 <a 
                   href={project.pdfUrl} 
                   target="_blank" 
-                  rel="noreferrer" 
+                  rel="noreferrer"
+                  download
                   className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf"
                 >
                   <div className="flex items-center gap-4">

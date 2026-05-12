@@ -105,8 +105,14 @@ function ProjectForm({
       }
       set("images", [...form.images, ...base64Urls]);
     } else {
-      // For ZIP/PDF, store the filename as a reference (can't embed large binary in localStorage)
-      set(field, `[local] ${files[0].name}`);
+      // Convert PDF/ZIP to base64 so it can be downloaded locally
+      const file = files[0];
+      const b64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => resolve(ev.target?.result as string);
+        reader.readAsDataURL(file);
+      });
+      set(field, b64);
     }
 
     setIsUploading(false);
