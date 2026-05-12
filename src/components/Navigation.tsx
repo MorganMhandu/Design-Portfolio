@@ -18,7 +18,6 @@ export function Navigation() {
     { label: "Projects", href: "#projects" },
     { label: "Technical Capabilities", href: "#capabilities" },
     { label: "Digital Systems", href: "#digital-systems" },
-    { label: "Engineering Dossier", href: "#dossier" },
     { label: "Contact", href: "#contact" },
   ];
 

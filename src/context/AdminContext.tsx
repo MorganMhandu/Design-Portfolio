@@ -110,7 +110,10 @@ function saveToStorage(data: any) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-    console.warn("localStorage save failed:", e);
+    console.error("localStorage save failed:", e);
+    if (e instanceof Error && e.name === "QuotaExceededError") {
+      alert("⚠️ STORAGE FULL: The file you just uploaded is too large for your browser's local memory. \n\nTo save large files, you MUST configure Supabase in your Vercel settings (see .env.template).");
+    }
   }
 }
 
