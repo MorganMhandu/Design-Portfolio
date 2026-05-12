@@ -37,16 +37,10 @@ export async function GET() {
 
     if (error) {
       if (error.message.includes("Object not found") || error.message.includes("not found")) {
-        // Seed the bucket with local file
+        // Fallback to local DB but DON'T seed it automatically (to prevent overwriting with stale data)
         const DB_PATH = path.join(process.cwd(), "src/data/db.json");
-        const localData = fs.readFileSync(DB_PATH, "utf8");
-        
-        await supabase.storage.from(bucketName).upload("db.json", localData, {
-          contentType: "application/json",
-          upsert: true,
-        });
-        
-        return NextResponse.json(JSON.parse(localData), { headers: { "Cache-Control": "no-store, max-age=0" } });
+        const localData = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
+        return NextResponse.json(localData, { headers: { "Cache-Control": "no-store, max-age=0" } });
       }
       throw new Error(`Failed to download db.json from Supabase: ${error.message}`);
     }
