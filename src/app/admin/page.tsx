@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Zap } from "lucide-react";
 
 const CREDENTIALS = {
-  operatorId: "MORGAN",
-  accessCode: "MECH_SYNAPSE_7734",
+  accessCode: "7734",
 };
 
 const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 minutes
@@ -17,12 +16,11 @@ const bootSequence = [
   "ENCRYPTION LAYER: AES-256 ACTIVE",
   "SESSION HANDLER: STANDBY",
   "CORE_SYSTEMS: ONLINE",
-  "AWAITING OPERATOR CREDENTIALS...",
+  "AWAITING ACCESS KEY...",
 ];
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [operatorId, setOperatorId] = useState("");
   const [accessCode, setAccessCode] = useState("");
   const [showCode, setShowCode] = useState(false);
   const [status, setStatus] = useState<"idle" | "scanning" | "success" | "denied">("idle");
@@ -69,15 +67,13 @@ export default function AdminLoginPage() {
         setScanProgress(100);
         clearInterval(scanInterval.current!);
 
-        const isValid =
-          operatorId.toUpperCase() === CREDENTIALS.operatorId &&
-          accessCode === CREDENTIALS.accessCode;
+        const isValid = accessCode === CREDENTIALS.accessCode;
 
         if (isValid) {
           setStatus("success");
           const expiry = Date.now() + SESSION_DURATION_MS;
           sessionStorage.setItem("admin_session_expiry", expiry.toString());
-          sessionStorage.setItem("admin_operator", operatorId.toUpperCase());
+          sessionStorage.setItem("admin_operator", "MORGAN");
           setTimeout(() => router.push("/admin/dashboard"), 1200);
         } else {
           setStatus("denied");
@@ -161,34 +157,17 @@ export default function AdminLoginPage() {
                 Identity Verification
               </h1>
               <p className="font-mono text-[10px] text-[#94A3B8]/60 tracking-widest uppercase mt-0.5">
-                Morgan Michael Mhandu // Admin Access
+                Admin Access
               </p>
             </div>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Operator ID */}
-            <div className="flex flex-col gap-2">
-              <label className="font-mono text-[9px] tracking-[0.3em] text-[#00F2FF]/70 uppercase">
-                Operator ID
-              </label>
-              <input
-                type="text"
-                id="operator-id"
-                value={operatorId}
-                onChange={(e) => setOperatorId(e.target.value)}
-                disabled={status === "scanning" || status === "success"}
-                className="bg-black/40 border border-[#00F2FF]/25 rounded-lg px-4 py-3 font-mono text-sm text-white tracking-widest focus:outline-none focus:border-[#00F2FF]/80 focus:shadow-[0_0_15px_rgba(0,242,255,0.15)] transition-all placeholder:text-white/15 uppercase"
-                placeholder="[ ENTER OPERATOR ID ]"
-                autoComplete="off"
-              />
-            </div>
-
             {/* Access Code */}
             <div className="flex flex-col gap-2">
               <label className="font-mono text-[9px] tracking-[0.3em] text-[#00F2FF]/70 uppercase">
-                Access Code
+                Access Key
               </label>
               <div className="relative">
                 <input
@@ -198,7 +177,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setAccessCode(e.target.value)}
                   disabled={status === "scanning" || status === "success"}
                   className="w-full bg-black/40 border border-[#00F2FF]/25 rounded-lg px-4 py-3 pr-12 font-mono text-sm text-white tracking-widest focus:outline-none focus:border-[#00F2FF]/80 focus:shadow-[0_0_15px_rgba(0,242,255,0.15)] transition-all placeholder:text-white/15"
-                  placeholder="[ ENTER ACCESS CODE ]"
+                  placeholder="[ ENTER ACCESS KEY ]"
                   autoComplete="off"
                 />
                 <button
@@ -216,7 +195,7 @@ export default function AdminLoginPage() {
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <span className="font-mono text-[9px] tracking-widest text-[#00F2FF]/70 uppercase animate-pulse">
-                    Biometric Scan In Progress...
+                    Accessing Secure Layer...
                   </span>
                   <span className="font-mono text-[9px] text-[#00F2FF]">
                     {Math.round(scanProgress)}%
@@ -236,7 +215,7 @@ export default function AdminLoginPage() {
               <div className="bg-red-500/10 border border-red-500/40 rounded-lg px-4 py-3 flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                 <span className="font-mono text-xs text-red-400 tracking-widest uppercase">
-                  ACCESS DENIED — Invalid Credentials
+                  ACCESS DENIED — Invalid Key
                 </span>
               </div>
             )}
@@ -245,7 +224,7 @@ export default function AdminLoginPage() {
               <div className="bg-[#00F2FF]/10 border border-[#00F2FF]/40 rounded-lg px-4 py-3 flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse shadow-[0_0_8px_rgba(0,242,255,0.8)]" />
                 <span className="font-mono text-xs text-[#00F2FF] tracking-widest uppercase">
-                  Identity Confirmed — Initializing Command Center...
+                  Access Granted — Initializing Dashboard...
                 </span>
               </div>
             )}
@@ -254,11 +233,11 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               id="auth-submit"
-              disabled={status === "scanning" || status === "success" || !operatorId || !accessCode}
+              disabled={status === "scanning" || status === "success" || !accessCode}
               className="mt-2 w-full py-4 bg-[linear-gradient(135deg,#00F2FF15,#00F2FF08)] border border-[#00F2FF]/50 text-[#00F2FF] font-mono font-bold text-sm tracking-[0.25em] uppercase rounded-xl hover:bg-[#00F2FF]/20 hover:border-[#00F2FF] hover:shadow-[0_0_25px_rgba(0,242,255,0.3)] transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Zap className="w-4 h-4" />
-              {status === "scanning" ? "SCANNING..." : status === "success" ? "ACCESS GRANTED" : "AUTHENTICATE"}
+              {status === "scanning" ? "PROCESSING..." : status === "success" ? "ACCESS GRANTED" : "ENTER COMMAND CENTER"}
             </button>
           </form>
 
