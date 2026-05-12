@@ -11,7 +11,7 @@ export function DigitalSystems() {
     <Section id="digital-systems">
       <SectionHeading>Digital Systems</SectionHeading>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         
         {systems.map((sys) => (
           <div key={sys.id} className="flex flex-col border border-[#00F2FF]/20 bg-background/50 p-8 rounded-max hover:border-[#00F2FF]/50 transition-all duration-300 group shadow-[rgba(0,242,255,0.05)_0px_0px_20px] relative overflow-hidden">
