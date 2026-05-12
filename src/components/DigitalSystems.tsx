@@ -90,7 +90,7 @@ function SystemCard({ system, idx, onOpen }: { system: DigitalSystem; idx: numbe
       <div className="absolute inset-0 bg-gradient-to-t from-[#00F2FF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       
       <div className="absolute bottom-4 left-0 right-0 overflow-hidden h-0 group-hover:h-6 transition-all duration-300">
-         <span className="text-[10px] font-mono tracking-[0.2em] text-[#00F2FF] uppercase">System Overview</span>
+         <span className="text-[10px] font-mono tracking-[0.2em] text-[#00F2FF] uppercase">System Overview <ChevronRight className="inline w-3 h-3 mb-0.5" /></span>
       </div>
     </motion.div>
   );
@@ -104,7 +104,7 @@ export function DigitalSystems() {
     <Section id="digital-systems">
       <SectionHeading>Digital Systems</SectionHeading>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 relative">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative">
         {systems.map((sys, idx) => (
           <SystemCard 
             key={sys.id} 

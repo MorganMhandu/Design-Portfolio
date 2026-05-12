@@ -165,7 +165,7 @@ export function CaseStudies() {
     <Section id="projects">
       <SectionHeading>Technical Case Studies</SectionHeading>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 relative">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 relative">
           {validProjects.map((project, idx) => (
             <ProjectCard 
               key={project.id} 
