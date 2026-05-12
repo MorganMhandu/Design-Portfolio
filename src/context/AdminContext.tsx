@@ -14,6 +14,8 @@ export type CaseProject = {
   cadSize?: string;
   dwgSize?: string;
   renderSize?: string;
+  zipUrl?: string;
+  pdfUrl?: string;
 };
 
 export type Pillar = {

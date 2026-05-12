@@ -8,14 +8,13 @@ import { CapabilityMatrix } from "./tabs/CapabilityMatrix";
 import { SystemGrid } from "./tabs/SystemGrid";
 import { DossierVault } from "./tabs/DossierVault";
 import { InquiryLog } from "./tabs/InquiryLog";
-import { TalentVault } from "./tabs/TalentVault";
 import { IdentityManager } from "./tabs/IdentityManager";
 import { ContactController } from "./tabs/ContactController";
 import { useAdmin } from "@/context/AdminContext";
 
 const SESSION_DURATION_MS = 30 * 60 * 1000;
 
-type TabId = "projects" | "capabilities" | "systems" | "dossier" | "inquiries" | "talent" | "identity" | "contact";
+type TabId = "projects" | "capabilities" | "systems" | "dossier" | "inquiries" | "identity" | "contact";
 
 const TABS: { id: TabId; label: string; sublabel: string; icon: React.ElementType }[] = [
   { id: "projects", label: "Project Manager", sublabel: "Technical Case Studies", icon: FolderKanban },
@@ -23,7 +22,6 @@ const TABS: { id: TabId; label: string; sublabel: string; icon: React.ElementTyp
   { id: "systems", label: "Digital Asset Manager", sublabel: "Web & Digital Infrastructure", icon: Cpu },
   { id: "dossier", label: "Dossier Vault", sublabel: "Engineering Reports", icon: FileArchive },
   { id: "inquiries", label: "Inquiry Log", sublabel: "Engage Terminal Messages", icon: MessageSquare },
-  { id: "talent", label: "Talent Vault", sublabel: "Candidate Intake", icon: Users },
   { id: "identity", label: "Identity Assets", sublabel: "Profile & Media", icon: UserCircle },
   { id: "contact", label: "Contact Controller", sublabel: "Public Data Management", icon: Smartphone },
 ];
@@ -91,7 +89,6 @@ export default function DashboardPage() {
       case "systems": return <SystemGrid />;
       case "dossier": return <DossierVault />;
       case "inquiries": return <InquiryLog />;
-      case "talent": return <TalentVault />;
       case "identity": return <IdentityManager />;
       case "contact": return <ContactController />;
     }

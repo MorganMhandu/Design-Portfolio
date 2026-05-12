@@ -103,31 +103,45 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 
             {/* Action Bay */}
             <div className="mt-auto flex flex-col gap-3">
-              <button className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-xl hover:bg-[#00F2FF]/20 transition-all group/btn">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 bg-black/40 rounded-lg text-[#00F2FF] border border-[#00F2FF]/20">
-                    <FileBarChart className="w-5 h-5" />
+              {project.zipUrl && (
+                <a 
+                  href={project.zipUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-xl hover:bg-[#00F2FF]/20 transition-all group/btn"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 bg-black/40 rounded-lg text-[#00F2FF] border border-[#00F2FF]/20">
+                      <FileBarChart className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-mono text-sm text-white tracking-widest uppercase">Technical Assets</p>
+                      <p className="font-mono text-[10px] text-[#00F2FF]/70 uppercase">Download ZIP Package</p>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <p className="font-mono text-sm text-white tracking-widest uppercase">Technical Assets</p>
-                    <p className="font-mono text-[10px] text-[#00F2FF]/70 uppercase">Download ZIP Package</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-white/40 group-hover/btn:translate-x-1 transition-transform" />
-              </button>
+                  <ChevronRight className="w-5 h-5 text-white/40 group-hover/btn:translate-x-1 transition-transform" />
+                </a>
+              )}
 
-              <button className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
-                    <FileText className="w-5 h-5" />
+              {project.pdfUrl && (
+                <a 
+                  href={project.pdfUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-mono text-sm tracking-widest uppercase">Engineering Reports</p>
+                      <p className="font-mono text-[10px] opacity-70 uppercase">View Technical PDF</p>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <p className="font-mono text-sm tracking-widest uppercase">Engineering Reports</p>
-                    <p className="font-mono text-[10px] opacity-70 uppercase">View Technical PDF</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 opacity-40 group-hover/pdf:translate-x-1 transition-transform" />
-              </button>
+                  <ChevronRight className="w-5 h-5 opacity-40 group-hover/pdf:translate-x-1 transition-transform" />
+                </a>
+              )}
             </div>
           </div>
         </div>

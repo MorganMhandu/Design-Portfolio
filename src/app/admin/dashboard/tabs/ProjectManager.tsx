@@ -13,6 +13,8 @@ const emptyProject = (): Omit<CaseProject, "id"> => ({
   cadSize: "",
   dwgSize: "",
   renderSize: "",
+  zipUrl: "",
+  pdfUrl: "",
 });
 
 function InputField({
@@ -53,17 +55,26 @@ function ProjectForm({
   const [form, setForm] = useState(initial);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
   const set = (key: keyof typeof form, val: any) =>
     setForm((prev) => ({ ...prev, [key]: val }));
 
-  const handleImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "zipUrl" | "pdfUrl") => {
     if (e.target.files && e.target.files.length > 0) {
       setIsUploading(true);
+      setUploadStatus(`Uploading ${field}...`);
       const formData = new FormData();
-      Array.from(e.target.files).forEach(file => {
-        formData.append("files", file);
-      });
+      
+      if (field === "images") {
+        Array.from(e.target.files).forEach(file => {
+          formData.append("files", file);
+        });
+        formData.append("folder", "portfolio/projects/renders");
+      } else {
+        formData.append("files", e.target.files[0]);
+        formData.append("folder", field === "zipUrl" ? "portfolio/projects/zip" : "portfolio/projects/pdf");
+      }
 
       try {
         const res = await fetch("/api/admin/upload", {
@@ -72,13 +83,18 @@ function ProjectForm({
         });
         const data = await res.json();
         if (data.urls) {
-          set("images", [...form.images, ...data.urls]);
+          if (field === "images") {
+            set("images", [...form.images, ...data.urls]);
+          } else {
+            set(field, data.urls[0]);
+          }
         }
       } catch (err) {
         console.error("Upload failed:", err);
-        alert("Image upload failed. Please try again.");
+        alert("Upload failed. Please try again.");
       } finally {
         setIsUploading(false);
+        setUploadStatus(null);
       }
     }
   };
@@ -124,11 +140,11 @@ function ProjectForm({
             Project Renders / Images
           </label>
           <label className="flex items-center gap-3 border border-dashed border-[#00F2FF]/25 rounded-lg p-4 cursor-pointer hover:border-[#00F2FF]/50 hover:bg-[#00F2FF]/5 transition-all">
-            {isUploading ? <Loader2 className="w-4 h-4 text-[#00F2FF] animate-spin" /> : <Camera className="w-4 h-4 text-[#00F2FF]/60" />}
+            {isUploading && uploadStatus?.includes("images") ? <Loader2 className="w-4 h-4 text-[#00F2FF] animate-spin" /> : <Camera className="w-4 h-4 text-[#00F2FF]/60" />}
             <span className="font-mono text-[10px] text-[#94A3B8]/60 tracking-widest">
-              {isUploading ? "UPLOADING_ASSETS..." : "Click to upload renders (JPG, PNG, WebP) - MULTIPLE SELECTION SUPPORTED"}
+              {isUploading && uploadStatus?.includes("images") ? "UPLOADING_ASSETS..." : "Click to upload renders (JPG, PNG, WebP) - MULTIPLE SELECTION SUPPORTED"}
             </span>
-            <input type="file" multiple accept="image/*" onChange={handleImages} className="hidden" disabled={isUploading} />
+            <input type="file" multiple accept="image/*" onChange={(e) => handleFileUpload(e, "images")} className="hidden" disabled={isUploading} />
           </label>
           {form.images.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-1">
@@ -150,26 +166,63 @@ function ProjectForm({
           )}
         </div>
 
-        {/* CAD/DWG File Uploads */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-[#00F2FF]/10">
-          {[
-            { label: "SolidWorks File (.sldprt / .sldasm)", accept: ".sldprt,.sldasm", badge: "SW" },
-            { label: "AutoCAD File (.dwg)", accept: ".dwg", badge: "ACAD" },
-            { label: "Lumion / Blender Render Pack", accept: ".zip,.rar,.lum,.blend", badge: "3D" },
-          ].map(({ label, accept, badge }) => (
-            <div key={label} className="flex flex-col gap-1.5">
-              <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center gap-2">
-                <span className="bg-[#E33539]/20 text-[#E33539] border border-[#E33539]/30 px-1.5 py-0.5 rounded text-[7px] font-bold">{badge}</span>
-                {label}
-              </label>
+        {/* Technical Asset Uploads */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#00F2FF]/10">
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
+              <span>Technical ZIP Package</span>
+              {form.zipUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
+            </label>
+            <div className="relative">
               <input
                 type="file"
-                accept={accept}
-                className="text-[9px] text-white/40 font-mono file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer"
+                accept=".zip,.rar,.7z"
+                onChange={(e) => handleFileUpload(e, "zipUrl")}
+                className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
+                disabled={isUploading}
               />
+              {isUploading && uploadStatus?.includes("zipUrl") && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
+              )}
             </div>
-          ))}
+            {form.zipUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.zipUrl}</p>}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
+              <span>Engineering Report (PDF)</span>
+              {form.pdfUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) => handleFileUpload(e, "pdfUrl")}
+                className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
+                disabled={isUploading}
+              />
+              {isUploading && uploadStatus?.includes("pdfUrl") && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
+              )}
+            </div>
+            {form.pdfUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.pdfUrl}</p>}
+          </div>
         </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 justify-end mt-2">
+          <button type="button" onClick={onCancel} className="px-5 py-2 font-mono text-xs tracking-widest uppercase text-[#94A3B8] border border-white/10 rounded-lg hover:border-white/30 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" disabled={isSaving || isUploading} className="px-6 py-2 font-mono text-xs tracking-widest uppercase bg-[#00F2FF] text-black font-bold rounded-lg hover:bg-[#00F2FF]/80 shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all flex items-center gap-2 disabled:opacity-50">
+            {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} 
+            {isSaving ? "SYNCING..." : "COMMIT DATA"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
 
         {/* Actions */}
         <div className="flex gap-3 justify-end mt-2">
@@ -304,18 +357,39 @@ export function ProjectManager() {
                 </div>
               </div>
               {expanded === proj.id && (
-                <div className="border-t border-[#00F2FF]/10 px-5 py-4 bg-black/20 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="border-t border-[#00F2FF]/10 px-5 py-4 bg-black/20 grid grid-cols-2 md:grid-cols-3 gap-4">
                   {[
                     { label: "Components", value: proj.components },
                     { label: "Automation", value: proj.automation },
-                    { label: "CAD Size", value: proj.cadSize || "—" },
-                    { label: "DWG Size", value: proj.dwgSize || "—" },
+                    { label: "CAD/DWG/Render", value: `${proj.cadSize || "—"} / ${proj.dwgSize || "—"} / ${proj.renderSize || "—"}` },
                   ].map(({ label, value }) => (
                     <div key={label}>
                       <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">{label}</p>
                       <p className="font-mono text-[10px] text-[#94A3B8] leading-relaxed">{value}</p>
                     </div>
                   ))}
+                  <div className="col-span-full grid grid-cols-2 gap-4 mt-2 pt-3 border-t border-[#00F2FF]/5">
+                    <div>
+                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">ZIP Package</p>
+                      {proj.zipUrl ? (
+                        <a href={proj.zipUrl} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-[#00F2FF] hover:underline truncate block">
+                          {proj.zipUrl}
+                        </a>
+                      ) : (
+                        <p className="font-mono text-[10px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">Engineering Report</p>
+                      {proj.pdfUrl ? (
+                        <a href={proj.pdfUrl} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-[#00F2FF] hover:underline truncate block">
+                          {proj.pdfUrl}
+                        </a>
+                      ) : (
+                        <p className="font-mono text-[10px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
