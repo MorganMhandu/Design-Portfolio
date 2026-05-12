@@ -9,9 +9,13 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-assets";
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-});
+// Create a helper to get the supabase client only when needed
+const getSupabase = () => {
+  if (!supabaseUrl || !supabaseKey) return null;
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+};
 
 export async function GET() {
   try {
@@ -20,6 +24,11 @@ export async function GET() {
       const DB_PATH = path.join(process.cwd(), "src/data/db.json");
       const data = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
       return NextResponse.json(data, { headers: { "Cache-Control": "no-store, max-age=0" } });
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      throw new Error("Supabase client not initialized");
     }
 
     const { data: fileData, error } = await supabase.storage
@@ -61,6 +70,11 @@ export async function POST(request: Request) {
       const DB_PATH = path.join(process.cwd(), "src/data/db.json");
       fs.writeFileSync(DB_PATH, JSON.stringify(newData, null, 2), "utf8");
       return NextResponse.json({ success: true, message: "SYNC SUCCESSFUL (LOCAL)" });
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      throw new Error("Supabase client not initialized");
     }
 
     const jsonString = JSON.stringify(newData, null, 2);

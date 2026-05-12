@@ -224,21 +224,6 @@ function ProjectForm({
   );
 }
 
-        {/* Actions */}
-        <div className="flex gap-3 justify-end mt-2">
-          <button type="button" onClick={onCancel} className="px-5 py-2 font-mono text-xs tracking-widest uppercase text-[#94A3B8] border border-white/10 rounded-lg hover:border-white/30 transition-colors">
-            Cancel
-          </button>
-          <button type="submit" disabled={isSaving || isUploading} className="px-6 py-2 font-mono text-xs tracking-widest uppercase bg-[#00F2FF] text-black font-bold rounded-lg hover:bg-[#00F2FF]/80 shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all flex items-center gap-2 disabled:opacity-50">
-            {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} 
-            {isSaving ? "SYNCING..." : "COMMIT DATA"}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
 export function ProjectManager() {
   const { projects, addProject, editProject, deleteProject } = useAdmin();
   const [mode, setMode] = useState<"list" | "add" | "edit">("list");

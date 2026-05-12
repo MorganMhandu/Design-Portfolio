@@ -7,22 +7,26 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-assets";
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-});
+const getSupabase = () => {
+  if (!supabaseUrl || !supabaseKey) return null;
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false },
+  });
+};
 
 export async function POST(request: Request) {
   try {
+    const supabase = getSupabase();
+    if (!supabase) {
+      return NextResponse.json({ error: "Supabase credentials missing from environment" }, { status: 500 });
+    }
+
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
     const folder = (formData.get("folder") as string) || "portfolio/media";
     
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
-    }
-
-    if (!supabaseUrl || !supabaseKey) {
-      return NextResponse.json({ error: "Supabase credentials missing from environment" }, { status: 500 });
     }
 
     const uploadedUrls: string[] = [];
