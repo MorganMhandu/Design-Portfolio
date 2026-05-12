@@ -172,40 +172,48 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<AdminContextType["syncStatus"]>("idle");
   const [initialized, setInitialized] = useState(false);
 
-  // ── 1. Load from localStorage first (instant, no flicker) ──
+  // ── 1. Load from localStorage first (instant, survives refresh) ──
   useEffect(() => {
     const local = loadFromStorage();
     if (local) {
-      if (local.projects) setProjects(local.projects);
-      if (local.pillars) setPillars(local.pillars);
-      if (local.reports) setReports(local.reports);
-      if (local.messages) setMessages(local.messages);
-      if (local.systems) setSystems(local.systems);
+      if (Array.isArray(local.projects)) setProjects(local.projects);
+      if (Array.isArray(local.pillars) && local.pillars.length > 0) setPillars(local.pillars);
+      if (Array.isArray(local.reports)) setReports(local.reports);
+      if (Array.isArray(local.messages)) setMessages(local.messages);
+      if (Array.isArray(local.systems) && local.systems.length > 0) setSystems(local.systems);
       if (local.settings) setSettings(local.settings);
     }
     setInitialized(true);
   }, []);
 
-  // ── 2. After local load, try to sync from Supabase cloud (if configured) ──
+  // ── 2. Only fetch from cloud if localStorage is EMPTY (first-time setup) ──
   useEffect(() => {
     if (!initialized) return;
+    const local = loadFromStorage();
+    const localHasData = local && (
+      (Array.isArray(local.projects) && local.projects.length > 0) ||
+      (Array.isArray(local.reports) && local.reports.length > 0) ||
+      (Array.isArray(local.messages) && local.messages.length > 0)
+    );
+
+    // If local data exists, skip cloud fetch entirely — local is the source of truth
+    if (localHasData) return;
+
+    // Only hit the cloud if we have nothing locally
     fetch("/api/admin/data")
       .then((res) => res.json())
       .then((data) => {
-        // Only accept cloud data if it actually has content
         if (data && !data.error) {
-          if (data.projects?.length) setProjects(data.projects);
-          if (data.pillars?.length) setPillars(data.pillars);
-          if (data.reports?.length) setReports(data.reports);
-          if (data.messages?.length) setMessages(data.messages);
-          if (data.systems?.length) setSystems(data.systems);
+          if (Array.isArray(data.projects) && data.projects.length > 0) setProjects(data.projects);
+          if (Array.isArray(data.pillars) && data.pillars.length > 0) setPillars(data.pillars);
+          if (Array.isArray(data.reports) && data.reports.length > 0) setReports(data.reports);
+          if (Array.isArray(data.messages) && data.messages.length > 0) setMessages(data.messages);
+          if (Array.isArray(data.systems) && data.systems.length > 0) setSystems(data.systems);
           if (data.settings) setSettings(data.settings);
-          // Update localStorage with cloud data
           saveToStorage(data);
         }
       })
       .catch(() => {
-        // Cloud unavailable — localStorage is the source of truth
         console.warn("Cloud sync unavailable. Using local data.");
       });
   }, [initialized]);
