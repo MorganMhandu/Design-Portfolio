@@ -304,19 +304,29 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
 }
 
 export function CaseStudies() {
-  const { projects } = useAdmin();
+  const { projects, syncStatus } = useAdmin();
   const [refreshKey, setRefreshKey] = useState(0);
-  const [selectedProject, setSelectedProject] = useState<CaseProject | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     setRefreshKey(prev => prev + 1);
   }, [projects]);
 
   const validProjects = projects.filter(p => p.title || p.focus || p.components || p.automation);
+  const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   return (
     <Section id="projects">
-      <SectionHeading>Technical Case Studies</SectionHeading>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <SectionHeading>Technical Case Studies</SectionHeading>
+        
+        {syncStatus === "syncing" && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-full animate-pulse">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#00F2FF]" />
+            <span className="font-mono text-[9px] text-[#00F2FF] tracking-widest uppercase">Syncing Cloud Data...</span>
+          </div>
+        )}
+      </div>
       
       {/* 4-Column Grid for Desktop */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
@@ -325,7 +335,7 @@ export function CaseStudies() {
               key={project.id} 
               project={project} 
               idx={idx} 
-              onOpen={() => setSelectedProject(project)}
+              onOpen={() => setSelectedProjectId(project.id)}
             />
           ))}
           {validProjects.length === 0 && (
@@ -340,7 +350,7 @@ export function CaseStudies() {
         {selectedProject && (
           <ProjectModal 
             project={selectedProject} 
-            onClose={() => setSelectedProject(null)} 
+            onClose={() => setSelectedProjectId(null)} 
           />
         )}
       </AnimatePresence>
