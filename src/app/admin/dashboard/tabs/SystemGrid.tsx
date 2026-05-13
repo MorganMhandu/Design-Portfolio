@@ -136,7 +136,14 @@ export function SystemGrid() {
                    <LinkIcon className="w-3 h-3" />
                    <span className="truncate max-w-[200px]">{sys.link}</span>
                 </div>
-                <button className="text-[9px] font-mono text-[#94A3B8] hover:text-[#00F2FF] transition-colors uppercase tracking-widest">Test Link</button>
+                <a 
+                  href={sys.link.startsWith('http') ? sys.link : `https://${sys.link}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[9px] font-mono text-[#94A3B8] hover:text-[#00F2FF] transition-colors uppercase tracking-widest"
+                >
+                  Test Link
+                </a>
               </div>
             </div>
           ))}

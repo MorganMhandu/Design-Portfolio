@@ -37,7 +37,12 @@ export function DigitalSystems() {
             </p>
 
             <div className="mt-auto pt-6 border-t border-muted/50">
-               <a href={sys.link} className="flex items-center gap-2 text-xs font-mono tracking-widest text-white hover:text-[#00F2FF] uppercase transition-colors">
+               <a 
+                 href={sys.link.startsWith('http') ? sys.link : `https://${sys.link}`} 
+                 target="_blank"
+                 rel="noreferrer"
+                 className="flex items-center gap-2 text-xs font-mono tracking-widest text-white hover:text-[#00F2FF] uppercase transition-colors"
+               >
                  <LayoutTemplate className="w-4 h-4" />
                  Launch Application
                </a>
