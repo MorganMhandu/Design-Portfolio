@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
-import { FileText, FileBarChart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { FileText, FileBarChart, ChevronLeft, ChevronRight, X, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
 
