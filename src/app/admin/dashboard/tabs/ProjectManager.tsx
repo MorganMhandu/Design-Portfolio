@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
-import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText } from "lucide-react";
 
 const emptyProject = (): Omit<CaseProject, "id"> => ({
   title: "",
@@ -208,7 +208,23 @@ function ProjectForm({
             </div>
             {form.zipUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.zipUrl}</p>}
           </div>
-
+          <div className="flex flex-col gap-2">
+            <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
+              <span>Engineering Report (PDF)</span>
+              {form.pdfUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) => handleFileUpload(e, "pdfUrl")}
+                className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
+                disabled={isUploading}
+              />
+              {isUploading && uploadStatus?.includes("pdfUrl") && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
+              )}
+            </div>
             {form.pdfUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.pdfUrl}</p>}
           </div>
         </div>
