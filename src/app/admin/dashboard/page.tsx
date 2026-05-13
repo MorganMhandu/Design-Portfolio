@@ -136,22 +136,26 @@ export default function DashboardPage() {
             </span>
           </div>
           
-          {!process.env.NEXT_PUBLIC_SUPABASE_URL && (
-            <button
-              onClick={async () => {
+          <button
+            onClick={async () => {
+              if (window.confirm("This will overwrite the cloud database with your current local browser data. Are you sure?")) {
                 const res = await forceCloudPush();
                 if (res.success) {
                   alert("RESCUE SUCCESSFUL: Your local data has been pushed to the cloud.");
                 } else {
-                  alert(`RESCUE FAILED: ${res.error || "Could not reach cloud. Check your environment variables."}`);
+                  alert(`RESCUE FAILED: ${res.error || "Could not reach cloud. Check your Supabase keys and Bucket settings."}`);
                 }
-              }}
-              className="px-3 py-1 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-mono text-[9px] tracking-widest uppercase rounded hover:bg-yellow-400/20 transition-all flex items-center gap-2"
-              title="Push local browser data to cloud"
-            >
-              <FileArchive className="w-3 h-3" /> Rescue Data to Cloud
-            </button>
-          )}
+              }
+            }}
+            className={`px-3 py-1.5 border font-mono text-[9px] tracking-widest uppercase rounded-lg transition-all flex items-center gap-2 ${
+              syncStatus === 'error' 
+                ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20' 
+                : 'bg-[#00F2FF]/5 border-[#00F2FF]/20 text-[#00F2FF]/70 hover:bg-[#00F2FF]/10 hover:text-[#00F2FF]'
+            }`}
+            title="Push local browser data to cloud"
+          >
+            <FileArchive className="w-3.5 h-3.5" /> Force Cloud Sync (Rescue)
+          </button>
 
           <div className="w-[1px] h-4 bg-[#00F2FF]/15" />
           {expiryTs > 0 && <SessionTimer expiryTs={expiryTs} />}
