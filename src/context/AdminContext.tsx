@@ -189,38 +189,40 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     init();
   }, []);
 
-  // ── 2. ALWAYS fetch from cloud in the background to ensure cross-browser sync ──
+  // ── 2. Only fetch from cloud if storage is EMPTY (first-time setup) ──
   useEffect(() => {
     if (!initialized) return;
     
-    async function performCloudSync() {
-      setSyncStatus("syncing");
+    async function checkCloudSync() {
+      const local = await loadFromStorage();
+      const localHasData = local && (
+        (Array.isArray(local.projects) && local.projects.length > 0) ||
+        (Array.isArray(local.reports) && local.reports.length > 0) ||
+        (Array.isArray(local.messages) && local.messages.length > 0)
+      );
+
+      // If local data exists, skip cloud fetch entirely — local is the source of truth
+      if (localHasData) return;
+
+      // Only hit the cloud if we have nothing locally
       try {
         const res = await fetch("/api/admin/data");
-        if (!res.ok) throw new Error("Cloud fetch failed");
-        
         const data = await res.json();
         if (data && !data.error) {
-          // Update local state with cloud data (Cloud is the master for cross-browser sync)
-          if (Array.isArray(data.projects)) setProjects(data.projects);
-          if (Array.isArray(data.pillars)) setPillars(data.pillars);
-          if (Array.isArray(data.reports)) setReports(data.reports);
-          if (Array.isArray(data.messages)) setMessages(data.messages);
-          if (Array.isArray(data.systems)) setSystems(data.systems);
+          if (Array.isArray(data.projects) && data.projects.length > 0) setProjects(data.projects);
+          if (Array.isArray(data.pillars) && data.pillars.length > 0) setPillars(data.pillars);
+          if (Array.isArray(data.reports) && data.reports.length > 0) setReports(data.reports);
+          if (Array.isArray(data.messages) && data.messages.length > 0) setMessages(data.messages);
+          if (Array.isArray(data.systems) && data.systems.length > 0) setSystems(data.systems);
           if (data.settings) setSettings(data.settings);
-          
-          // Update local storage to match cloud
           await saveToStorage(data);
-          setSyncStatus("success");
-          setTimeout(() => setSyncStatus("idle"), 2000);
         }
-      } catch (err) {
-        console.warn("Cloud sync failed, staying with local data.");
-        setSyncStatus("idle");
+      } catch {
+        console.warn("Cloud sync unavailable. Using local data.");
       }
     }
     
-    performCloudSync();
+    checkCloudSync();
   }, [initialized]);
 
   // ── Sync Helper: saves to localStorage immediately, then tries cloud ──
