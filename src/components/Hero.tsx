@@ -163,15 +163,14 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-bold leading-[1.05] tracking-tighter mb-4 drop-shadow-lg"
+            className="font-bold leading-[1.05] tracking-tighter mb-4 drop-shadow-lg text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem]"
             style={{ 
-              fontSize: "4rem",
               backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 50%, #78909C 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent"
             }}
           >
-            Mechanical Systems &amp; <br />
+            Mechanical Systems &amp; <br className="hidden sm:block" />
             Automation Engineer
           </motion.h1>
 
@@ -230,10 +229,6 @@ export function Hero() {
               />
               {/* Technical HUD Overlay on Video */}
               <div className="absolute inset-0 pointer-events-none border-[1px] border-[#00F2FF]/20 m-4 rounded-xl" />
-              <div className="absolute top-6 left-6 flex items-center gap-2 opacity-50">
-                <div className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse" />
-                <span className="font-mono text-[8px] text-[#00F2FF] tracking-[0.2em] uppercase">Sim_Active</span>
-              </div>
               <div className="absolute bottom-6 right-6 opacity-30">
                 <PlayCircle className="w-6 h-6 text-[#00F2FF]" />
               </div>

@@ -287,11 +287,8 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
              <span className="font-mono text-[10px] text-[#00F2FF]/30 tracking-widest uppercase">No Image</span>
           </div>
         )}
-        <div className="absolute top-3 left-3 z-10">
-           <span className="px-2 py-1 bg-black/80 border border-[#00F2FF]/30 rounded-md font-mono text-[8px] tracking-widest text-[#00F2FF] uppercase backdrop-blur-md">
-             PROJ_{idx + 1}
-           </span>
         </div>
+      </div>
       </div>
 
       <div className="p-5 flex flex-col flex-grow justify-between bg-gradient-to-t from-black/60 to-transparent">
