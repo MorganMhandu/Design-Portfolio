@@ -146,6 +146,7 @@ type AdminContextType = {
 
   settings: AdminSettings;
   updateSettings: (s: Partial<AdminSettings>) => void;
+  forceCloudPush: () => Promise<{ success: boolean; error?: string }>;
 };
 
 const AdminContext = createContext<AdminContextType | null>(null);
@@ -262,12 +263,48 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         } else {
           setSyncStatus("idle"); // Not an error — local save succeeded
         }
-      } catch {
-        setSyncStatus("idle"); // Cloud sync failed but local save succeeded
+      } catch (err) {
+        console.error("Cloud sync error:", err);
+        setSyncStatus("error");
       }
     },
     [projects, pillars, reports, messages, systems, settings]
   );
+
+  // Force push local data to cloud (Rescue Mission helper)
+  const forceCloudPush = useCallback(async () => {
+    setSyncStatus("syncing");
+    try {
+      const fullState = {
+        projects,
+        pillars,
+        reports,
+        messages,
+        systems,
+        settings,
+        lastUpdated: new Date().toISOString(),
+      };
+
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fullState),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Cloud push failed");
+      }
+
+      setSyncStatus("success");
+      setTimeout(() => setSyncStatus("idle"), 3000);
+      return { success: true };
+    } catch (err: any) {
+      console.error("Force push failed:", err);
+      setSyncStatus("error");
+      return { success: false, error: err.message };
+    }
+  }, [projects, pillars, reports, messages, systems, settings]);
 
   // ── Projects ──
   const addProject = useCallback((p: Omit<CaseProject, "id">) => {
@@ -384,6 +421,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         messages, addMessage, markRead, deleteMessage,
         systems, addSystem, editSystem, deleteSystem,
         settings, updateSettings,
+        forceCloudPush,
       }}
     >
       {children}

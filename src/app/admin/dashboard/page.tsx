@@ -50,7 +50,7 @@ function SessionTimer({ expiryTs }: { expiryTs: number }) {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { messages, syncStatus } = useAdmin();
+  const { messages, syncStatus, forceCloudPush } = useAdmin();
   const [activeTab, setActiveTab] = useState<TabId>("projects");
   const [operator, setOperator] = useState("MORGAN");
   const [expiryTs, setExpiryTs] = useState(0);
@@ -135,6 +135,24 @@ export default function DashboardPage() {
                process.env.NEXT_PUBLIC_SUPABASE_URL ? 'CLOUD_DATABASE: ONLINE' : 'LOCAL_STORAGE: ACTIVE (NON-PERSISTENT)'}
             </span>
           </div>
+          
+          {!process.env.NEXT_PUBLIC_SUPABASE_URL && (
+            <button
+              onClick={async () => {
+                const res = await forceCloudPush();
+                if (res.success) {
+                  alert("RESCUE SUCCESSFUL: Your local data has been pushed to the cloud.");
+                } else {
+                  alert(`RESCUE FAILED: ${res.error || "Could not reach cloud. Check your environment variables."}`);
+                }
+              }}
+              className="px-3 py-1 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-mono text-[9px] tracking-widest uppercase rounded hover:bg-yellow-400/20 transition-all flex items-center gap-2"
+              title="Push local browser data to cloud"
+            >
+              <FileArchive className="w-3 h-3" /> Rescue Data to Cloud
+            </button>
+          )}
+
           <div className="w-[1px] h-4 bg-[#00F2FF]/15" />
           {expiryTs > 0 && <SessionTimer expiryTs={expiryTs} />}
         </div>
