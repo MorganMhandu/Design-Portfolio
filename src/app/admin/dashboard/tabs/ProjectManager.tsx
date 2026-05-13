@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
-import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText } from "lucide-react";
+import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText, FileArchive } from "lucide-react";
 
 const emptyProject = (): Omit<CaseProject, "id"> => ({
   title: "",
@@ -195,18 +195,34 @@ function ProjectForm({
               {form.zipUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
             </label>
             <div className="relative">
-              <input
-                type="file"
-                accept=".zip,.rar,.7z"
-                onChange={(e) => handleFileUpload(e, "zipUrl")}
-                className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
-                disabled={isUploading}
-              />
+              {form.zipUrl ? (
+                <div className="flex items-center gap-3 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-lg p-3">
+                  <FileArchive className="w-5 h-5 text-[#00F2FF]" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-mono text-[10px] text-[#00F2FF] truncate">Technical_Assets.zip</p>
+                    <p className="font-mono text-[7px] text-[#00F2FF]/50 truncate uppercase tracking-widest">Linked Asset Active</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => set("zipUrl", "")}
+                    className="p-1.5 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <input
+                  type="file"
+                  accept=".zip,.rar,.7z"
+                  onChange={(e) => handleFileUpload(e, "zipUrl")}
+                  className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
+                  disabled={isUploading}
+                />
+              )}
               {isUploading && uploadStatus?.includes("zipUrl") && (
                 <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
               )}
             </div>
-            {form.zipUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.zipUrl}</p>}
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
@@ -214,18 +230,34 @@ function ProjectForm({
               {form.pdfUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
             </label>
             <div className="relative">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => handleFileUpload(e, "pdfUrl")}
-                className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
-                disabled={isUploading}
-              />
+              {form.pdfUrl ? (
+                <div className="flex items-center gap-3 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-lg p-3">
+                  <FileText className="w-5 h-5 text-[#00F2FF]" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-mono text-[10px] text-[#00F2FF] truncate">Engineering_Report.pdf</p>
+                    <p className="font-mono text-[7px] text-[#00F2FF]/50 truncate uppercase tracking-widest">Main Report Linked</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => set("pdfUrl", "")}
+                    className="p-1.5 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => handleFileUpload(e, "pdfUrl")}
+                  className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
+                  disabled={isUploading}
+                />
+              )}
               {isUploading && uploadStatus?.includes("pdfUrl") && (
                 <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
               )}
             </div>
-            {form.pdfUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.pdfUrl}</p>}
           </div>
         </div>
 
