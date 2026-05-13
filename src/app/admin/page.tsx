@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Zap } from "lucide-react";
 
 const CREDENTIALS = {
-  accessCode: "7734",
+  accessCode: "Morgan@17/08/25",
 };
 
 const SESSION_DURATION_MS = 30 * 60 * 1000; // 30 minutes

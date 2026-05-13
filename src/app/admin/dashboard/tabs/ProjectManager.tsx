@@ -487,23 +487,38 @@ export function ProjectManager() {
                     <div>
                       <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">ZIP Package</p>
                       {proj.zipUrl ? (
-                        <a href={proj.zipUrl} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-[#00F2FF] hover:underline truncate block">
-                          {proj.zipUrl}
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <FileArchive className="w-3.5 h-3.5 text-[#00F2FF]" />
+                          <span className="font-mono text-[9px] text-[#00F2FF] uppercase">Linked Asset Active</span>
+                        </div>
                       ) : (
-                        <p className="font-mono text-[10px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
+                        <p className="font-mono text-[9px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
                       )}
                     </div>
                     <div>
-                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">Engineering Report</p>
+                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">Main Engineering Report</p>
                       {proj.pdfUrl ? (
-                        <a href={proj.pdfUrl} target="_blank" rel="noreferrer" className="font-mono text-[10px] text-[#00F2FF] hover:underline truncate block">
-                          {proj.pdfUrl}
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3.5 h-3.5 text-[#00F2FF]" />
+                          <span className="font-mono text-[9px] text-[#00F2FF] uppercase">Main Report Active</span>
+                        </div>
                       ) : (
-                        <p className="font-mono text-[10px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
+                        <p className="font-mono text-[9px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
                       )}
                     </div>
+                    {proj.reports && proj.reports.length > 0 && (
+                      <div className="col-span-full mt-2 pt-3 border-t border-[#00F2FF]/5">
+                        <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-2">Additional Technical Dossiers</p>
+                        <div className="flex flex-wrap gap-3">
+                          {proj.reports.map((r, i) => (
+                            <div key={i} className="flex items-center gap-2 bg-[#00F2FF]/5 px-2 py-1 rounded border border-[#00F2FF]/20">
+                              <FileText className="w-3 h-3 text-[#00F2FF]" />
+                              <span className="font-mono text-[9px] text-white/70 uppercase">{r.title}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
