@@ -16,7 +16,8 @@ export type CaseProject = {
   dwgSize?: string;
   renderSize?: string;
   zipUrl?: string;
-  pdfUrl?: string;
+  pdfUrl?: string; // Legacy single report
+  reports?: { id: string; title: string; url: string }[];
 };
 
 export type Pillar = {

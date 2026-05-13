@@ -15,6 +15,7 @@ const emptyProject = (): Omit<CaseProject, "id"> => ({
   renderSize: "",
   zipUrl: "",
   pdfUrl: "",
+  reports: [],
 });
 
 function InputField({
@@ -208,24 +209,85 @@ function ProjectForm({
             {form.zipUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.zipUrl}</p>}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
-              <span>Engineering Report (PDF)</span>
-              {form.pdfUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => handleFileUpload(e, "pdfUrl")}
-                className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
-                disabled={isUploading}
-              />
-              {isUploading && uploadStatus?.includes("pdfUrl") && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
-              )}
-            </div>
             {form.pdfUrl && <p className="text-[7px] font-mono text-[#00F2FF]/40 truncate">{form.pdfUrl}</p>}
+          </div>
+        </div>
+
+        {/* Multi-Reports Section */}
+        <div className="flex flex-col gap-3 pt-4 border-t border-[#00F2FF]/10">
+          <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase">Project Specific Reports</label>
+          <div className="flex flex-col gap-2">
+            {(form.reports || []).map((report, idx) => (
+              <div key={idx} className="flex items-center gap-3 bg-black/20 p-2 rounded-lg border border-[#00F2FF]/10">
+                <FileText className="w-3.5 h-3.5 text-[#00F2FF]/60" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-[10px] text-white truncate">{report.title}</p>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => set("reports", (form.reports || []).filter((_, i) => i !== idx))}
+                  className="text-red-400/50 hover:text-red-400 transition-colors p-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+            
+            <div className="flex flex-col gap-2 p-3 bg-[#00F2FF]/5 border border-[#00F2FF]/20 rounded-lg mt-1">
+              <p className="font-mono text-[8px] text-[#00F2FF] uppercase tracking-widest mb-1">Add New Report</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input 
+                  type="text" 
+                  id="new-report-title"
+                  placeholder="Report Title (e.g., QA Analysis)"
+                  className="bg-black/40 border border-[#00F2FF]/20 rounded px-2 py-1.5 font-mono text-[10px] text-white outline-none"
+                />
+                <input 
+                  type="file" 
+                  id="new-report-file"
+                  accept=".pdf"
+                  className="text-[9px] text-white/40 font-mono file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 cursor-pointer"
+                />
+              </div>
+              <button 
+                type="button"
+                onClick={async () => {
+                  const titleInput = document.getElementById('new-report-title') as HTMLInputElement;
+                  const fileInput = document.getElementById('new-report-file') as HTMLInputElement;
+                  if (!titleInput.value || !fileInput.files?.[0]) return;
+                  
+                  setIsUploading(true);
+                  const file = fileInput.files[0];
+                  let url = "";
+                  
+                  try {
+                    const formData = new FormData();
+                    formData.append("files", file);
+                    formData.append("folder", "portfolio/projects/reports");
+                    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+                    const data = await res.json();
+                    if (res.ok && data.urls) url = data.urls[0];
+                  } catch {}
+
+                  if (!url) {
+                    url = await new Promise<string>((resolve) => {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => resolve(ev.target?.result as string);
+                      reader.readAsDataURL(file);
+                    });
+                  }
+
+                  const newReport = { id: `rep-${Date.now()}`, title: titleInput.value, url };
+                  set("reports", [...(form.reports || []), newReport]);
+                  titleInput.value = "";
+                  fileInput.value = "";
+                  setIsUploading(false);
+                }}
+                className="self-end px-3 py-1 bg-[#00F2FF]/20 border border-[#00F2FF]/40 text-[#00F2FF] font-mono text-[9px] uppercase tracking-widest rounded hover:bg-[#00F2FF]/30 transition-all"
+              >
+                Add Report
+              </button>
+            </div>
           </div>
         </div>
 

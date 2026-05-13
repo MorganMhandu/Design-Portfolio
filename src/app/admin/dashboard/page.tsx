@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { FolderKanban, LayoutGrid, FileArchive, MessageSquare, LogOut, ChevronRight, Cpu, Users, UserCircle, Smartphone } from "lucide-react";
 import { ProjectManager } from "./tabs/ProjectManager";
-import { ReportManager } from "./tabs/ReportManager";
 import { CapabilityMatrix } from "./tabs/CapabilityMatrix";
 import { SystemGrid } from "./tabs/SystemGrid";
 import { InquiryLog } from "./tabs/InquiryLog";
@@ -14,11 +13,10 @@ import { useAdmin } from "@/context/AdminContext";
 
 const SESSION_DURATION_MS = 30 * 60 * 1000;
 
-type TabId = "projects" | "reports" | "capabilities" | "systems" | "inquiries" | "identity" | "contact";
+type TabId = "projects" | "capabilities" | "systems" | "inquiries" | "identity" | "contact";
 
 const TABS: { id: TabId; label: string; sublabel: string; icon: React.ElementType }[] = [
   { id: "projects", label: "Project Manager", sublabel: "Technical Case Studies", icon: FolderKanban },
-  { id: "reports", label: "Report Manager", sublabel: "Engineering Dossier", icon: FileArchive },
   { id: "capabilities", label: "Capability Matrix", sublabel: "Skill Pillars", icon: LayoutGrid },
   { id: "systems", label: "Digital Asset Manager", sublabel: "Web & Digital Infrastructure", icon: Cpu },
   { id: "inquiries", label: "Inquiry Log", sublabel: "Engage Terminal Messages", icon: MessageSquare },
@@ -85,7 +83,6 @@ export default function DashboardPage() {
   const renderTab = () => {
     switch (activeTab) {
       case "projects": return <ProjectManager />;
-      case "reports": return <ReportManager />;
       case "capabilities": return <CapabilityMatrix />;
       case "systems": return <SystemGrid />;
       case "inquiries": return <InquiryLog />;

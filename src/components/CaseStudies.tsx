@@ -12,6 +12,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [downloadingZip, setDownloadingZip] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleDownload = async (url: string, filename: string, type: 'zip' | 'pdf') => {
     if (type === 'zip') setDownloadingZip(true);
@@ -187,9 +188,61 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                   <ChevronRight className="w-5 h-5 opacity-40 group-hover/pdf:translate-x-1 transition-transform" />
                 </button>
               ) : null}
+
+              {/* Multi-Reports List */}
+              {(project.reports || []).map((report) => (
+                <button 
+                  key={report.id}
+                  onClick={() => setPreviewUrl(report.url)}
+                  className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/rep"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 bg-black/20 rounded-lg group-hover/rep:bg-black/10">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-mono text-sm tracking-widest uppercase">{report.title}</p>
+                      <p className="font-mono text-[10px] opacity-70 uppercase">Click to Preview & Download</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 opacity-40 group-hover/rep:translate-x-1 transition-transform" />
+                </button>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* PDF Preview Overlay */}
+        <AnimatePresence>
+          {previewUrl && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[250] bg-black/95 flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-[#00F2FF]/20">
+                <span className="font-mono text-xs text-[#00F2FF] tracking-widest uppercase">Report Preview</span>
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => handleDownload(previewUrl, "Engineering_Report.pdf", "pdf")}
+                    className="flex items-center gap-2 px-4 py-1.5 bg-[#00F2FF] text-black font-mono text-[10px] font-bold uppercase rounded-lg hover:bg-[#00F2FF]/80 transition-all"
+                  >
+                    Download PDF
+                  </button>
+                  <button onClick={() => setPreviewUrl(null)} className="text-white/50 hover:text-white"><X className="w-5 h-5" /></button>
+                </div>
+              </div>
+              <div className="flex-1 w-full bg-white overflow-hidden">
+                <iframe 
+                  src={previewUrl} 
+                  className="w-full h-full border-none"
+                  title="PDF Preview"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );
