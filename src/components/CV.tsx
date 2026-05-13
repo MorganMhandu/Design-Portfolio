@@ -29,7 +29,13 @@ export function CV() {
                   {report.description}
                 </p>
                 <div className="shrink-0 w-full md:w-[20%]">
-                  <a href="#" className="flex items-center justify-between w-full p-2.5 rounded bg-[#00F2FF]/5 hover:bg-[#00F2FF]/15 border border-[#00F2FF]/20 hover:border-[#00F2FF]/50 transition-all group/dl cursor-pointer">
+                  <a 
+                    href={report.cloudUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    download={report.fileName || "Engineering_Report.pdf"}
+                    className="flex items-center justify-between w-full p-2.5 rounded bg-[#00F2FF]/5 hover:bg-[#00F2FF]/15 border border-[#00F2FF]/20 hover:border-[#00F2FF]/50 transition-all group/dl cursor-pointer"
+                  >
                     <span className="font-mono text-[9px] text-[#00F2FF]/80 uppercase tracking-widest truncate max-w-[80%]">{report.fileName}</span>
                     <FileDown className="w-3.5 h-3.5 text-[#00F2FF] group-hover/dl:scale-110 transition-transform" />
                   </a>

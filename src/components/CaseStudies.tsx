@@ -10,6 +10,45 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () => void }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [downloadingZip, setDownloadingZip] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  const handleDownload = async (url: string, filename: string, type: 'zip' | 'pdf') => {
+    if (type === 'zip') setDownloadingZip(true);
+    else setDownloadingPdf(true);
+
+    try {
+      // Simulate a small delay to allow the UI to update
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      if (url.startsWith('data:')) {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const objectUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000);
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Download failed', error);
+      alert('Download failed. The file may be invalid or too large.');
+    } finally {
+      if (type === 'zip') setDownloadingZip(false);
+      else setDownloadingPdf(false);
+    }
+  };
 
   useEffect(() => {
     if (!project.images || project.images.length <= 1) return;
@@ -103,45 +142,50 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 
             {/* Action Bay */}
             <div className="mt-auto flex flex-col gap-3">
-              {project.zipUrl && project.zipUrl.startsWith("http") || project.zipUrl?.startsWith("data:") ? (
-                <a 
-                  href={project.zipUrl} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  download
-                  className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-xl hover:bg-[#00F2FF]/20 transition-all group/btn"
+              {project.zipUrl && (project.zipUrl.startsWith("http") || project.zipUrl.startsWith("data:")) ? (
+                <button 
+                  onClick={() => handleDownload(project.zipUrl!, `${project.title.replace(/\s+/g, '_')}_Technical_Assets.zip`, 'zip')}
+                  disabled={downloadingZip}
+                  className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-xl hover:bg-[#00F2FF]/20 transition-all group/btn disabled:opacity-70 disabled:cursor-wait"
                 >
                   <div className="flex items-center gap-4">
                     <div className="p-2.5 bg-black/40 rounded-lg text-[#00F2FF] border border-[#00F2FF]/20">
-                      <FileBarChart className="w-5 h-5" />
+                      {downloadingZip ? (
+                        <div className="w-5 h-5 border-2 border-[#00F2FF]/30 border-t-[#00F2FF] rounded-full animate-spin" />
+                      ) : (
+                        <FileBarChart className="w-5 h-5" />
+                      )}
                     </div>
                     <div className="text-left">
-                      <p className="font-mono text-sm text-white tracking-widest uppercase">Technical Assets</p>
-                      <p className="font-mono text-[10px] text-[#00F2FF]/70 uppercase">Download ZIP Package</p>
+                      <p className="font-mono text-sm text-white tracking-widest uppercase">{downloadingZip ? "Preparing..." : "Technical Assets"}</p>
+                      <p className="font-mono text-[10px] text-[#00F2FF]/70 uppercase">{downloadingZip ? "Converting to file..." : "Download ZIP Package"}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-white/40 group-hover/btn:translate-x-1 transition-transform" />
-                </a>
+                </button>
               ) : null}
 
-              {project.pdfUrl && project.pdfUrl.startsWith("http") || project.pdfUrl?.startsWith("data:") ? (
-                <a 
-                  href={project.pdfUrl} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf"
+              {project.pdfUrl && (project.pdfUrl.startsWith("http") || project.pdfUrl.startsWith("data:")) ? (
+                <button 
+                  onClick={() => handleDownload(project.pdfUrl!, `${project.title.replace(/\s+/g, '_')}_Engineering_Report.pdf`, 'pdf')}
+                  disabled={downloadingPdf}
+                  className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf disabled:opacity-70 disabled:cursor-wait"
                 >
                   <div className="flex items-center gap-4">
                     <div className="p-2.5 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
-                      <FileText className="w-5 h-5" />
+                      {downloadingPdf ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin group-hover/pdf:border-black/30 group-hover/pdf:border-t-black" />
+                      ) : (
+                        <FileText className="w-5 h-5" />
+                      )}
                     </div>
                     <div className="text-left">
-                      <p className="font-mono text-sm tracking-widest uppercase">Engineering Reports</p>
-                      <p className="font-mono text-[10px] opacity-70 uppercase">View Technical PDF</p>
+                      <p className="font-mono text-sm tracking-widest uppercase">{downloadingPdf ? "Preparing..." : "Engineering Reports"}</p>
+                      <p className="font-mono text-[10px] opacity-70 uppercase">{downloadingPdf ? "Converting to file..." : "View Technical PDF"}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 opacity-40 group-hover/pdf:translate-x-1 transition-transform" />
-                </a>
+                </button>
               ) : null}
             </div>
           </div>

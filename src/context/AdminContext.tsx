@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
+import { get, set as idbSet } from "idb-keyval";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -94,26 +95,21 @@ const DEFAULT_SETTINGS: AdminSettings = {
 
 const STORAGE_KEY = "portfolio_admin_data";
 
-function loadFromStorage() {
+async function loadFromStorage() {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
+    return await get(STORAGE_KEY);
   } catch {
     return null;
   }
 }
 
-function saveToStorage(data: any) {
+async function saveToStorage(data: any) {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    await idbSet(STORAGE_KEY, data);
   } catch (e) {
-    console.error("localStorage save failed:", e);
-    if (e instanceof Error && e.name === "QuotaExceededError") {
-      alert("⚠️ STORAGE FULL: The file you just uploaded is too large for your browser's local memory. \n\nTo save large files, you MUST configure Supabase in your Vercel settings (see .env.template).");
-    }
+    console.error("IndexedDB save failed:", e);
   }
 }
 
@@ -175,37 +171,42 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<AdminContextType["syncStatus"]>("idle");
   const [initialized, setInitialized] = useState(false);
 
-  // ── 1. Load from localStorage first (instant, survives refresh) ──
+  // ── 1. Load from storage first (instant, survives refresh) ──
   useEffect(() => {
-    const local = loadFromStorage();
-    if (local) {
-      if (Array.isArray(local.projects)) setProjects(local.projects);
-      if (Array.isArray(local.pillars) && local.pillars.length > 0) setPillars(local.pillars);
-      if (Array.isArray(local.reports)) setReports(local.reports);
-      if (Array.isArray(local.messages)) setMessages(local.messages);
-      if (Array.isArray(local.systems) && local.systems.length > 0) setSystems(local.systems);
-      if (local.settings) setSettings(local.settings);
+    async function init() {
+      const local = await loadFromStorage();
+      if (local) {
+        if (Array.isArray(local.projects)) setProjects(local.projects);
+        if (Array.isArray(local.pillars) && local.pillars.length > 0) setPillars(local.pillars);
+        if (Array.isArray(local.reports)) setReports(local.reports);
+        if (Array.isArray(local.messages)) setMessages(local.messages);
+        if (Array.isArray(local.systems) && local.systems.length > 0) setSystems(local.systems);
+        if (local.settings) setSettings(local.settings);
+      }
+      setInitialized(true);
     }
-    setInitialized(true);
+    init();
   }, []);
 
-  // ── 2. Only fetch from cloud if localStorage is EMPTY (first-time setup) ──
+  // ── 2. Only fetch from cloud if storage is EMPTY (first-time setup) ──
   useEffect(() => {
     if (!initialized) return;
-    const local = loadFromStorage();
-    const localHasData = local && (
-      (Array.isArray(local.projects) && local.projects.length > 0) ||
-      (Array.isArray(local.reports) && local.reports.length > 0) ||
-      (Array.isArray(local.messages) && local.messages.length > 0)
-    );
+    
+    async function checkCloudSync() {
+      const local = await loadFromStorage();
+      const localHasData = local && (
+        (Array.isArray(local.projects) && local.projects.length > 0) ||
+        (Array.isArray(local.reports) && local.reports.length > 0) ||
+        (Array.isArray(local.messages) && local.messages.length > 0)
+      );
 
-    // If local data exists, skip cloud fetch entirely — local is the source of truth
-    if (localHasData) return;
+      // If local data exists, skip cloud fetch entirely — local is the source of truth
+      if (localHasData) return;
 
-    // Only hit the cloud if we have nothing locally
-    fetch("/api/admin/data")
-      .then((res) => res.json())
-      .then((data) => {
+      // Only hit the cloud if we have nothing locally
+      try {
+        const res = await fetch("/api/admin/data");
+        const data = await res.json();
         if (data && !data.error) {
           if (Array.isArray(data.projects) && data.projects.length > 0) setProjects(data.projects);
           if (Array.isArray(data.pillars) && data.pillars.length > 0) setPillars(data.pillars);
@@ -213,12 +214,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           if (Array.isArray(data.messages) && data.messages.length > 0) setMessages(data.messages);
           if (Array.isArray(data.systems) && data.systems.length > 0) setSystems(data.systems);
           if (data.settings) setSettings(data.settings);
-          saveToStorage(data);
+          await saveToStorage(data);
         }
-      })
-      .catch(() => {
+      } catch {
         console.warn("Cloud sync unavailable. Using local data.");
-      });
+      }
+    }
+    
+    checkCloudSync();
   }, [initialized]);
 
   // ── Sync Helper: saves to localStorage immediately, then tries cloud ──
@@ -240,8 +243,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         settings: overrides.settings ?? settings,
       };
 
-      // Always save to localStorage first
-      saveToStorage(fullState);
+      // Always save to storage first
+      await saveToStorage(fullState);
 
       // Then try cloud sync
       setSyncStatus("syncing");
