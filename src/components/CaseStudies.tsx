@@ -13,6 +13,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
   const [downloadingZip, setDownloadingZip] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showReportList, setShowReportList] = useState(false);
 
   const handleDownload = async (url: string, filename: string, type: 'zip' | 'pdf') => {
     if (type === 'zip') setDownloadingZip(true);
@@ -166,48 +167,66 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                 </button>
               ) : null}
 
-              {project.pdfUrl && (project.pdfUrl.startsWith("http") || project.pdfUrl.startsWith("data:")) ? (
-                <button 
-                  onClick={() => handleDownload(project.pdfUrl!, `${project.title.replace(/\s+/g, '_')}_Engineering_Report.pdf`, 'pdf')}
-                  disabled={downloadingPdf}
-                  className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/pdf disabled:opacity-70 disabled:cursor-wait"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="p-2.5 bg-black/20 rounded-lg group-hover/pdf:bg-black/10">
-                      {downloadingPdf ? (
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin group-hover/pdf:border-black/30 group-hover/pdf:border-t-black" />
-                      ) : (
+              {/* Engineering Reports Entry Point */}
+              {(project.pdfUrl || (project.reports && project.reports.length > 0)) ? (
+                <div className="flex flex-col gap-2">
+                  <button 
+                    onClick={() => setShowReportList(!showReportList)}
+                    className={`w-full flex items-center justify-between px-5 py-4 border transition-all group/pdf ${
+                      showReportList 
+                        ? "bg-[#00F2FF] text-black border-[#00F2FF] rounded-t-xl" 
+                        : "bg-white/5 text-white border-white/10 rounded-xl hover:bg-[#00F2FF]/10"
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2.5 rounded-lg ${showReportList ? "bg-black/10" : "bg-black/20"}`}>
                         <FileText className="w-5 h-5" />
-                      )}
+                      </div>
+                      <div className="text-left">
+                        <p className="font-mono text-sm tracking-widest uppercase">Engineering Reports</p>
+                        <p className={`font-mono text-[10px] uppercase ${showReportList ? "text-black/60" : "opacity-70"}`}>
+                          {(project.reports?.length || 0) + (project.pdfUrl ? 1 : 0)} Available Dossiers
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <p className="font-mono text-sm tracking-widest uppercase">{downloadingPdf ? "Preparing..." : "Engineering Reports"}</p>
-                      <p className="font-mono text-[10px] opacity-70 uppercase">{downloadingPdf ? "Converting to file..." : "View Technical PDF"}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 opacity-40 group-hover/pdf:translate-x-1 transition-transform" />
-                </button>
-              ) : null}
+                    <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${showReportList ? "rotate-180" : ""}`} />
+                  </button>
 
-              {/* Multi-Reports List */}
-              {(project.reports || []).map((report) => (
-                <button 
-                  key={report.id}
-                  onClick={() => setPreviewUrl(report.url)}
-                  className="w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl hover:bg-[#00F2FF] hover:text-black hover:border-[#00F2FF] transition-all group/rep"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="p-2.5 bg-black/20 rounded-lg group-hover/rep:bg-black/10">
-                      <FileText className="w-5 h-5" />
+                  {/* Expanded Report List */}
+                  {showReportList && (
+                    <div className="flex flex-col gap-2 p-2 bg-black/40 border-x border-b border-[#00F2FF]/30 rounded-b-xl animate-in slide-in-from-top-2 duration-200">
+                      {/* Legacy PDF */}
+                      {project.pdfUrl && (
+                        <button 
+                          onClick={() => setPreviewUrl(project.pdfUrl!)}
+                          className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/5 rounded-lg hover:bg-white/10 transition-all group/rep"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-4 h-4 text-[#00F2FF]" />
+                            <span className="font-mono text-[11px] tracking-widest uppercase text-white/80">Main Technical Dossier</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 opacity-30 group-hover/rep:translate-x-1 transition-transform" />
+                        </button>
+                      )}
+
+                      {/* Project Reports */}
+                      {(project.reports || []).map((report) => (
+                        <button 
+                          key={report.id}
+                          onClick={() => setPreviewUrl(report.url)}
+                          className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/5 rounded-lg hover:bg-white/10 transition-all group/rep"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-4 h-4 text-[#00F2FF]" />
+                            <span className="font-mono text-[11px] tracking-widest uppercase text-white/80">{report.title}</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 opacity-30 group-hover/rep:translate-x-1 transition-transform" />
+                        </button>
+                      ))}
                     </div>
-                    <div className="text-left">
-                      <p className="font-mono text-sm tracking-widest uppercase">{report.title}</p>
-                      <p className="font-mono text-[10px] opacity-70 uppercase">Click to Preview & Download</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 opacity-40 group-hover/rep:translate-x-1 transition-transform" />
-                </button>
-              ))}
+                  )}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
