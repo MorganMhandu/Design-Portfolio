@@ -163,11 +163,12 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-bold leading-[1.05] tracking-tighter mb-4 drop-shadow-lg text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem]"
+            className="font-bold leading-[1.05] tracking-tighter mb-4 drop-shadow-[0_0_15px_rgba(0,242,255,0.3)] text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem]"
             style={{ 
-              backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 50%, #78909C 100%)",
+              backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 45%, #B0BEC5 100%)",
               WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
+              WebkitTextFillColor: "transparent",
+              filter: "drop-shadow(0 0 1px rgba(255,255,255,0.5))"
             }}
           >
             Mechanical Systems &amp; <br className="hidden sm:block" />
@@ -215,7 +216,7 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="w-full lg:w-[48%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[inset_0_0_60px_rgba(0,242,255,0.1),0_0_40px_rgba(0,242,255,0.2)] backdrop-blur-md group"
+          className="w-full lg:w-[48%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/40 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.15),inset_0_0_30px_rgba(0,242,255,0.05)] backdrop-blur-md group"
         >
           {settings.heroVideo ? (
             <div className="relative w-full h-full">

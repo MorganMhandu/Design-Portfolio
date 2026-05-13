@@ -9,7 +9,12 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrai
 export const metadata: Metadata = {
   title: "Morgan Michael Mhandu | Portfolio",
   description: "Mechanical Systems & Automation Engineer Portfolio",
+  other: {
+    "build-id": `v-${Date.now()}`
+  }
 };
+
+export const dynamic = 'force-dynamic';
 
 export default function RootLayout({
   children,
