@@ -288,8 +288,6 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
           </div>
         )}
         </div>
-      </div>
-      </div>
 
       <div className="p-5 flex flex-col flex-grow justify-between bg-gradient-to-t from-black/60 to-transparent">
         <h3 className="text-sm font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300 line-clamp-2 mb-4">
