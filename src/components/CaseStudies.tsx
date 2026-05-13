@@ -33,7 +33,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000);
+        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 5000);
       } else {
         const link = document.createElement('a');
         link.href = url;

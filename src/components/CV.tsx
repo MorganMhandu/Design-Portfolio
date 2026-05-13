@@ -1,11 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { Section, SectionHeading } from "./Section";
 import { FileText, FileDown } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 
 export function CV() {
   const { reports } = useAdmin();
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  const handleDownload = async (url: string, filename: string) => {
+    setDownloading(url);
+    try {
+      if (url.startsWith('data:')) {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const objectUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 5000);
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Download failed', error);
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   const validReports = reports.filter(r => r.title && r.fileName);
 
@@ -29,16 +61,16 @@ export function CV() {
                   {report.description}
                 </p>
                 <div className="shrink-0 w-full md:w-[20%]">
-                  <a 
-                    href={report.cloudUrl} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    download={report.fileName || "Engineering_Report.pdf"}
-                    className="flex items-center justify-between w-full p-2.5 rounded bg-[#00F2FF]/5 hover:bg-[#00F2FF]/15 border border-[#00F2FF]/20 hover:border-[#00F2FF]/50 transition-all group/dl cursor-pointer"
+                  <button 
+                    onClick={() => handleDownload(report.cloudUrl!, report.fileName || "Engineering_Report.pdf")}
+                    disabled={downloading === report.cloudUrl}
+                    className="flex items-center justify-between w-full p-2.5 rounded bg-[#00F2FF]/5 hover:bg-[#00F2FF]/15 border border-[#00F2FF]/20 hover:border-[#00F2FF]/50 transition-all group/dl cursor-pointer disabled:opacity-50"
                   >
-                    <span className="font-mono text-[9px] text-[#00F2FF]/80 uppercase tracking-widest truncate max-w-[80%]">{report.fileName}</span>
-                    <FileDown className="w-3.5 h-3.5 text-[#00F2FF] group-hover/dl:scale-110 transition-transform" />
-                  </a>
+                    <span className="font-mono text-[9px] text-[#00F2FF]/80 uppercase tracking-widest truncate max-w-[80%]">
+                      {downloading === report.cloudUrl ? "Processing..." : (report.fileName || "Download")}
+                    </span>
+                    <FileDown className={`w-3.5 h-3.5 text-[#00F2FF] group-hover/dl:scale-110 transition-transform ${downloading === report.cloudUrl ? "animate-bounce" : ""}`} />
+                  </button>
                 </div>
               </div>
             </div>
