@@ -190,7 +190,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     init();
   }, []);
 
-  // ── 2. ALWAYS fetch from cloud in the background to ensure cross-browser sync ──
+  // ── 2. Fetch from cloud in the background, but ONLY if cloud data is newer ──
   useEffect(() => {
     if (!initialized) return;
     
@@ -205,7 +205,19 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         
         const data = await res.json();
         if (data && !data.error) {
-          // Update local state with cloud data (Cloud is the master for cross-browser sync)
+          // Check timestamps: only overwrite if cloud data is newer than local data
+          const localData = await loadFromStorage();
+          const localTs = localData?.lastUpdated ? new Date(localData.lastUpdated).getTime() : 0;
+          const cloudTs = data.lastUpdated ? new Date(data.lastUpdated).getTime() : 0;
+          
+          // If local data is newer (user just made changes), skip overwrite
+          if (localTs > cloudTs) {
+            console.log("Local data is newer than cloud — skipping overwrite to preserve fresh changes.");
+            setSyncStatus("idle");
+            return;
+          }
+
+          // Cloud is newer or equal — safe to update local state
           if (Array.isArray(data.projects)) setProjects(data.projects);
           if (Array.isArray(data.pillars)) setPillars(data.pillars);
           if (Array.isArray(data.reports)) setReports(data.reports);
@@ -244,9 +256,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         messages: overrides.messages ?? messages,
         systems: overrides.systems ?? systems,
         settings: overrides.settings ?? settings,
+        lastUpdated: new Date().toISOString(), // Timestamp to prevent stale cloud overwrite
       };
 
-      // Always save to storage first
+      // Always save to storage first (with timestamp)
       await saveToStorage(fullState);
 
       // Then try cloud sync
