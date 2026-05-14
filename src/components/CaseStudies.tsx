@@ -89,24 +89,36 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 
         <div className="flex flex-col md:flex-row h-full overflow-y-auto">
           {/* Visual Layer */}
-          <div className="w-full md:w-1/2 relative min-h-[300px] bg-[#000814] border-b md:border-b-0 md:border-r border-[#00F2FF]/10 flex items-center justify-center group/carousel">
+          <div className="w-full md:w-1/2 relative min-h-[300px] bg-[#000814] border-b md:border-b-0 md:border-r border-[#00F2FF]/10 flex items-center justify-center group/carousel overflow-hidden">
             {project.images && project.images.length > 0 ? (
               <>
-                <Image 
-                  src={project.images[currentImageIndex]} 
-                  alt={`${project.title} - Render ${currentImageIndex + 1}`} 
-                  width={800} 
-                  height={600} 
-                  className="w-full h-full object-contain p-4 transition-all duration-700"
-                  priority
-                />
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentImageIndex}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.02 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className="absolute inset-0 w-full h-full p-4"
+                  >
+                    <Image 
+                      src={project.images[currentImageIndex]} 
+                      alt={`${project.title} - Render ${currentImageIndex + 1}`} 
+                      fill
+                      className="object-contain"
+                      priority
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+                
                 {project.images.length > 1 && (
                   <>
                     <button onClick={handlePrev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 p-2 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronLeft className="w-5 h-5" /></button>
                     <button onClick={handleNext} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 p-2 rounded-full text-[#00F2FF] border border-[#00F2FF]/20 opacity-0 group-hover/carousel:opacity-100 transition-all hover:bg-[#00F2FF] hover:text-black z-10"><ChevronRight className="w-5 h-5" /></button>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10 bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/5">
                       {project.images.map((_, i) => (
-                        <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }} className={`w-2 h-2 rounded-full transition-all ${i === currentImageIndex ? "bg-[#00F2FF] w-4" : "bg-white/20 hover:bg-white/40"}`} />
+                        <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i); }} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === currentImageIndex ? "bg-[#00F2FF] w-4" : "bg-white/30 hover:bg-white/60"}`} />
                       ))}
                     </div>
                   </>
