@@ -1,7 +1,6 @@
-"use client";
-
+import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
-import { Mail, Linkedin, Github, MapPin } from "lucide-react";
+import { Mail, Linkedin, Github, MapPin, X } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -12,6 +11,24 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 
 export function Contact() {
   const { settings } = useAdmin();
+  const [showEmailFallback, setShowEmailFallback] = useState(false);
+
+  useEffect(() => {
+    if (showEmailFallback) {
+      const timer = setTimeout(() => setShowEmailFallback(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showEmailFallback]);
+
+  const handleEmailClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // 1. Primary Action: Try to open default mail client
+    window.location.href = `mailto:${settings.contact.email}?subject=Engineering Inquiry`;
+    // 2. Fallback UI: Show the Gmail deep link in case the primary action fails
+    setShowEmailFallback(true);
+  };
+
+  const gmailDeepLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${settings.contact.email}&su=Engineering Inquiry`;
 
   return (
     <Section id="contact" className="pb-32">
@@ -37,15 +54,36 @@ export function Contact() {
                   <span className="font-mono text-sm font-bold tracking-wider text-white drop-shadow-[0_0_8px_rgba(0,242,255,0.3)]">{settings.contact.phone}</span>
                 </a>
               </li>
-              <li className="flex items-center gap-4 text-foreground/80 transition-colors group">
-                <a href={`mailto:${settings.contact.email}`} className="flex items-center gap-4 w-full" title="Launch Secure Mail Interface">
+              <li className="flex flex-col gap-2 transition-colors group">
+                <button onClick={handleEmailClick} className="flex items-center gap-4 w-full text-left" title="Launch Secure Mail Interface">
                   <div className="flex items-center justify-center w-8 h-8 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 text-[#00F2FF] hover:bg-[#00F2FF]/20 transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,242,255,0.3)] shrink-0">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="font-mono text-[10px] tracking-[0.4em] text-[#00F2FF]/60 uppercase group-hover:text-[#00F2FF] transition-colors">
                     Direct Inquiry
                   </span>
-                </a>
+                </button>
+                
+                {/* Fallback Email UI (Hybrid Email) */}
+                {showEmailFallback && (
+                  <div className="ml-12 mt-1 px-4 py-3 bg-[#00F2FF]/5 border border-[#00F2FF]/20 rounded-lg animate-in slide-in-from-top-2 fade-in duration-300 relative">
+                    <button onClick={() => setShowEmailFallback(false)} className="absolute top-2 right-2 text-[#00F2FF]/40 hover:text-[#00F2FF]">
+                      <X className="w-3 h-3" />
+                    </button>
+                    <p className="text-[10px] font-mono text-white/60 mb-2 tracking-wide pr-4">
+                      Opening your email app... Didn&apos;t work?
+                    </p>
+                    <a 
+                      href={gmailDeepLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00F2FF]/10 border border-[#00F2FF]/30 hover:bg-[#00F2FF]/20 text-[#00F2FF] font-mono text-[10px] font-bold uppercase tracking-widest rounded transition-all"
+                    >
+                      <Mail className="w-3 h-3" />
+                      Open in Gmail
+                    </a>
+                  </div>
+                )}
               </li>
               <li className="flex items-center gap-4 text-foreground/80 hover:text-white transition-colors group">
                 <div className="flex items-center justify-center w-8 h-8 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 text-[#00F2FF] group-hover:bg-[#00F2FF]/20 transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] group-hover:shadow-[0_0_15px_rgba(0,242,255,0.3)] shrink-0">
@@ -56,7 +94,7 @@ export function Contact() {
             </ul>
             <div className="flex items-center gap-4 mt-auto pt-6 border-t border-[#00F2FF]/10">
               <span className="text-[10px] font-mono tracking-widest text-[#00F2FF]/50 uppercase mr-4">Network Links:</span>
-              <a href={`mailto:${settings.contact.email}`} className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Mail className="w-5 h-5" /></a>
+              <button onClick={handleEmailClick} className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Mail className="w-5 h-5" /></button>
               <a href="https://linkedin.com/in/morgan-mhandu" target="_blank" rel="noreferrer" className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Linkedin className="w-5 h-5" /></a>
               <a href="https://github.com/morgan-mhandu" target="_blank" rel="noreferrer" className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Github className="w-5 h-5" /></a>
             </div>
