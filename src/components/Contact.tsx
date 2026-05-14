@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Section, SectionHeading } from "./Section";
-import { Mail, Linkedin, Github, MapPin, PhoneCall, Send } from "lucide-react";
+import { Mail, Linkedin, Github, MapPin } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -12,28 +11,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 );
 
 export function Contact() {
-  const { addMessage, settings } = useAdmin();
-  const [formState, setFormState] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    // Push to admin inquiry log
-    addMessage({
-      name: formState.name,
-      email: formState.email,
-      message: formState.message,
-    });
-
-    // Simulate slight delay for UX
-    await new Promise((r) => setTimeout(r, 600));
-    setSubmitted(true);
-    setSubmitting(false);
-    setFormState({ name: "", email: "", message: "" });
-  };
+  const { settings } = useAdmin();
 
   return (
     <Section id="contact" className="pb-32">
@@ -84,41 +62,20 @@ export function Contact() {
             </div>
           </div>
 
-          {/* Right Column: Terminal Form */}
-          <div className="md:w-1/2 overflow-visible">
-            {submitted ? (
-              <div className="flex flex-col items-center justify-center h-full gap-6 py-16 border border-[#00F2FF]/20 rounded-2xl bg-[#00F2FF]/5 overflow-visible">
-                <div className="w-16 h-16 rounded-2xl border border-[#00F2FF]/40 bg-[#00F2FF]/10 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,255,0.2)]">
-                  <Send className="w-7 h-7 text-[#00F2FF]" />
-                </div>
-                <div className="text-center">
-                  <p className="font-mono text-sm font-bold text-[#00F2FF] tracking-widest uppercase drop-shadow-[0_0_8px_rgba(0,242,255,0.5)]">TRANSMISSION RECEIVED</p>
-                  <p className="font-mono text-[10px] text-[#94A3B8]/60 tracking-widest mt-2">Your message has been logged. I&apos;ll respond via secure channel.</p>
-                </div>
-                <button onClick={() => setSubmitted(false)} className="font-mono text-[10px] tracking-widest text-[#00F2FF]/50 hover:text-[#00F2FF] uppercase transition-colors">
-                  Send another transmission
-                </button>
+          {/* Right Column: Video Placeholder */}
+          <div className="md:w-1/2 flex flex-col justify-center overflow-visible">
+            <div className="w-full aspect-video rounded-2xl border border-[#00F2FF]/20 bg-[#000814]/50 flex flex-col items-center justify-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="w-16 h-16 rounded-full border border-[#00F2FF]/30 bg-[#00F2FF]/5 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,242,255,0.1)] group-hover:scale-110 transition-transform duration-500">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6 text-[#00F2FF]/70 ml-1">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <input type="text" name="_gotcha" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="name" className="text-[10px] font-mono text-[#00F2FF]/60 uppercase tracking-widest">Name</label>
-                  <input type="text" id="name" name="name" required value={formState.name} onChange={(e) => setFormState({ ...formState, name: e.target.value })} className="bg-[#020617]/50 border border-[#00F2FF]/20 py-4 px-5 focus:outline-none focus:border-[#00F2FF]/80 transition-colors text-white placeholder:text-white/20 shadow-[inset_0_0_20px_rgba(0,242,255,0.02)] rounded-xl font-mono text-xs hover:border-[#00F2FF]/40" placeholder="Full Name" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="text-[10px] font-mono text-[#00F2FF]/60 uppercase tracking-widest">Email</label>
-                  <input type="email" id="email" name="email" required value={formState.email} onChange={(e) => setFormState({ ...formState, email: e.target.value })} className="bg-[#020617]/50 border border-[#00F2FF]/20 py-4 px-5 focus:outline-none focus:border-[#00F2FF]/80 transition-colors text-white placeholder:text-white/20 shadow-[inset_0_0_20px_rgba(0,242,255,0.02)] rounded-xl font-mono text-xs hover:border-[#00F2FF]/40" placeholder="Email Address" />
-                </div>
-                <div className="flex flex-col gap-1.5 relative">
-                  <label htmlFor="message" className="text-[10px] font-mono text-[#00F2FF]/60 uppercase tracking-widest">Message</label>
-                  <textarea id="message" name="message" required rows={4} value={formState.message} onChange={(e) => setFormState({ ...formState, message: e.target.value })} className="bg-[#020617]/50 border border-[#00F2FF]/20 py-3 px-5 focus:outline-none focus:border-[#00F2FF]/80 transition-colors text-white resize-none placeholder:text-white/20 shadow-[inset_0_0_20px_rgba(0,242,255,0.02)] rounded-xl font-mono text-xs hover:border-[#00F2FF]/40" placeholder="Your Message or Project Brief" />
-                </div>
-                <button type="submit" disabled={submitting} className="self-start mt-4 px-12 py-4 bg-[linear-gradient(180deg,#FFFFFF_10%,#BFC9D2_40%,#DCE3EA_70%,#94A3B8_100%)] text-black font-bold tracking-[0.2em] uppercase rounded-xl hover:scale-[1.02] transition-all duration-300 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,255,0.2)] hover:shadow-[0_0_40px_rgba(0,242,255,0.6)] disabled:opacity-60 disabled:cursor-not-allowed gap-3">
-                  {submitting ? "Sending..." : "Send"}
-                </button>
-              </form>
-            )}
+              <p className="font-mono text-xs text-[#00F2FF]/40 tracking-widest uppercase relative z-10">
+                Video Reel Placeholder
+              </p>
+            </div>
           </div>
         </div>
       </div>
