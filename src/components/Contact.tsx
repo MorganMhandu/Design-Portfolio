@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
 import { Mail, Linkedin, Github, MapPin, X } from "lucide-react";
