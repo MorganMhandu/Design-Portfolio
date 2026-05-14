@@ -55,14 +55,14 @@ export function Contact() {
                 </a>
               </li>
               <li className="flex flex-col gap-2 transition-colors group">
-                <button onClick={handleEmailClick} className="flex items-center gap-4 w-full text-left" title="Launch Secure Mail Interface">
+                <a href={`mailto:${settings.contact.email}?subject=Engineering Inquiry`} onClick={() => setShowEmailFallback(true)} className="flex items-center gap-4 w-full text-left" title="Launch Secure Mail Interface">
                   <div className="flex items-center justify-center w-8 h-8 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 text-[#00F2FF] hover:bg-[#00F2FF]/20 transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,242,255,0.3)] shrink-0">
                     <Mail className="w-4 h-4" />
                   </div>
                   <span className="font-mono text-[10px] tracking-[0.4em] text-[#00F2FF]/60 uppercase group-hover:text-[#00F2FF] transition-colors">
                     Direct Inquiry
                   </span>
-                </button>
+                </a>
                 
                 {/* Fallback Email UI (Hybrid Email) */}
                 {showEmailFallback && (
@@ -94,26 +94,39 @@ export function Contact() {
             </ul>
             <div className="flex items-center gap-4 mt-auto pt-6 border-t border-[#00F2FF]/10">
               <span className="text-[10px] font-mono tracking-widest text-[#00F2FF]/50 uppercase mr-4">Network Links:</span>
-              <button onClick={handleEmailClick} className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Mail className="w-5 h-5" /></button>
+              <a href={`mailto:${settings.contact.email}?subject=Engineering Inquiry`} onClick={() => setShowEmailFallback(true)} className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Mail className="w-5 h-5" /></a>
               <a href="https://linkedin.com/in/morgan-mhandu" target="_blank" rel="noreferrer" className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Linkedin className="w-5 h-5" /></a>
               <a href="https://github.com/morgan-mhandu" target="_blank" rel="noreferrer" className="w-12 h-12 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 flex items-center justify-center hover:bg-[#00F2FF]/20 hover:border-[#00F2FF]/80 transition-all text-[#00F2FF] hover:shadow-[0_0_15px_rgba(0,242,255,0.4)]"><Github className="w-5 h-5" /></a>
             </div>
           </div>
 
-          {/* Right Column: Video Placeholder */}
+          {/* Right Column: Video or Placeholder */}
           <div className="md:w-1/2 flex flex-col justify-center overflow-visible">
-            <div className="w-full aspect-video rounded-2xl border border-[#00F2FF]/20 bg-[#000814]/50 flex flex-col items-center justify-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <div className="w-16 h-16 rounded-full border border-[#00F2FF]/30 bg-[#00F2FF]/5 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,242,255,0.1)] group-hover:scale-110 transition-transform duration-500">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6 text-[#00F2FF]/70 ml-1">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            {settings.contactVideo ? (
+              <div className="w-full aspect-video rounded-2xl border border-[#00F2FF]/20 bg-[#000814]/50 overflow-hidden shadow-[0_0_30px_rgba(0,242,255,0.1)] group">
+                <video 
+                  src={settings.contactVideo} 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                />
               </div>
-              <p className="font-mono text-xs text-[#00F2FF]/40 tracking-widest uppercase relative z-10">
-                Video Reel Placeholder
-              </p>
-            </div>
+            ) : (
+              <div className="w-full aspect-video rounded-2xl border border-[#00F2FF]/20 bg-[#000814]/50 flex flex-col items-center justify-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="w-16 h-16 rounded-full border border-[#00F2FF]/30 bg-[#00F2FF]/5 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,242,255,0.1)] group-hover:scale-110 transition-transform duration-500">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6 text-[#00F2FF]/70 ml-1">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="font-mono text-xs text-[#00F2FF]/40 tracking-widest uppercase relative z-10">
+                  Video Reel Placeholder
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -60,6 +60,7 @@ export type AdminSettings = {
   profilePicture: string;
   showProfilePicture: boolean;
   heroVideo?: string;
+  contactVideo?: string;
   contact: {
     phone: string;
     whatsapp: string;
@@ -86,6 +87,7 @@ const DEFAULT_SETTINGS: AdminSettings = {
   profilePicture: "",
   showProfilePicture: true,
   heroVideo: "/assets/simulation-hero.mp4",
+  contactVideo: "",
   contact: {
     phone: "+263 773 745 068",
     whatsapp: "https://wa.me/263773745068",

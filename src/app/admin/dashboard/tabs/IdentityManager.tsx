@@ -12,7 +12,8 @@ export function IdentityManager() {
   const [draft, setDraft] = useState({ 
     profilePicture: settings.profilePicture, 
     showProfilePicture: settings.showProfilePicture,
-    heroVideo: settings.heroVideo
+    heroVideo: settings.heroVideo,
+    contactVideo: settings.contactVideo || ""
   });
   const [dirty, setDirty] = useState(false);
   const [synced, setSynced] = useState(false);
@@ -21,9 +22,10 @@ export function IdentityManager() {
     if (!dirty) setDraft({ 
       profilePicture: settings.profilePicture, 
       showProfilePicture: settings.showProfilePicture,
-      heroVideo: settings.heroVideo 
+      heroVideo: settings.heroVideo,
+      contactVideo: settings.contactVideo || ""
     });
-  }, [settings.profilePicture, settings.showProfilePicture, settings.heroVideo, dirty]);
+  }, [settings.profilePicture, settings.showProfilePicture, settings.heroVideo, settings.contactVideo, dirty]);
 
   const handleChange = (field: string, value: any) => {
     setDraft(prev => ({ ...prev, [field]: value }));
@@ -38,7 +40,7 @@ export function IdentityManager() {
     setTimeout(() => setSynced(false), 3000);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "profilePicture" | "heroVideo") => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "profilePicture" | "heroVideo" | "contactVideo") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -176,6 +178,56 @@ export function IdentityManager() {
           <div className="p-4 border border-white/5 rounded-xl bg-black/20">
             <p className="font-mono text-[9px] text-[#94A3B8]/60 leading-relaxed">
               Recommended: MP4 format, loop-friendly simulation or CAD render. Keep file size under 50MB for optimal performance.
+            </p>
+          </div>
+        </div>
+
+        {/* Contact Video Management */}
+        <div className="p-8 border border-[#00F2FF]/20 rounded-2xl bg-[#00F2FF]/5 flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-mono text-sm font-bold text-[#00F2FF] tracking-widest uppercase">Contact Video Reel</h3>
+          </div>
+
+          <div className="relative aspect-video w-full rounded-2xl border-2 border-dashed border-[#00F2FF]/20 overflow-hidden group">
+            {draft.contactVideo ? (
+              <>
+                <video 
+                  src={draft.contactVideo} 
+                  autoPlay 
+                  loop 
+                  muted 
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                  <label className="cursor-pointer p-3 rounded-full bg-[#00F2FF] text-black hover:scale-110 transition-transform">
+                    <Upload className="w-5 h-5" />
+                    <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, "contactVideo")} accept="video/*" />
+                  </label>
+                  <button 
+                    onClick={() => handleChange("contactVideo", "")}
+                    className="p-3 rounded-full bg-red-500 text-white hover:scale-110 transition-transform"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <label className="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer hover:bg-[#00F2FF]/5 transition-colors">
+                <div className="w-16 h-16 rounded-full bg-[#00F2FF]/10 flex items-center justify-center text-[#00F2FF]/40 border border-[#00F2FF]/20">
+                  <Film className="w-8 h-8" />
+                </div>
+                <div className="text-center">
+                  <p className="font-mono text-[10px] text-[#00F2FF] tracking-widest uppercase mb-1">{uploading ? "Uploading..." : "Click to Upload Video"}</p>
+                  <p className="font-mono text-[8px] text-[#94A3B8]/40 tracking-widest uppercase">Target: Contact_Section</p>
+                </div>
+                <input type="file" className="hidden" onChange={(e) => handleFileUpload(e, "contactVideo")} accept="video/*" />
+              </label>
+            )}
+          </div>
+
+          <div className="p-4 border border-white/5 rounded-xl bg-black/20">
+            <p className="font-mono text-[9px] text-[#94A3B8]/60 leading-relaxed">
+              Recommended: MP4 format. Keep file size under 50MB. This replaces the empty placeholder in the Engage section.
             </p>
           </div>
         </div>
