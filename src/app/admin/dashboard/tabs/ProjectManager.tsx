@@ -88,8 +88,11 @@ function ProjectForm({
         setUploadStatus(null);
         setIsUploading(false);
         return;
+      } else {
+        alert(`Cloud upload failed: ${data.error || 'Unknown error'}. Falling back to local encoding (This may break sync if file is >4MB).`);
       }
-    } catch {
+    } catch (err: any) {
+      alert(`Cloud upload exception: ${err.message}. Falling back to local encoding.`);
       // Cloud unavailable — fall through to local base64 fallback
     }
 

@@ -275,14 +275,20 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(fullState),
         });
-        if (res.ok) {
-          setSyncStatus("success");
-          setTimeout(() => setSyncStatus("idle"), 3000);
-        } else {
-          setSyncStatus("idle"); // Not an error — local save succeeded
+        
+        if (!res.ok) {
+          if (res.status === 413) {
+            throw new Error("Payload Too Large. The files are too big (likely due to base64 fallback). Fix Supabase upload keys.");
+          }
+          const text = await res.text();
+          throw new Error(`Sync failed (${res.status}): ${text.slice(0, 100)}`);
         }
-      } catch (err) {
+        
+        setSyncStatus("success");
+        setTimeout(() => setSyncStatus("idle"), 3000);
+      } catch (err: any) {
         console.error("Cloud sync error:", err);
+        alert(`CLOUD SYNC ERROR: ${err.message}`);
         setSyncStatus("error");
       }
     },
@@ -309,9 +315,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(fullState),
       });
 
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        throw new Error(data.error || "Cloud push failed");
+      if (!res.ok) {
+        if (res.status === 413) {
+          throw new Error("Payload Too Large (413). Files are too big for Vercel. Fix Supabase credentials to upload directly to bucket.");
+        }
+        const text = await res.text();
+        throw new Error(`Cloud push failed (${res.status}): ${text.slice(0, 100)}`);
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (data.error) {
+        throw new Error(data.error);
       }
 
       setSyncStatus("success");
