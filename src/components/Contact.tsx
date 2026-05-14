@@ -53,7 +53,7 @@ export function Contact() {
                     <div className="absolute inset-0 rounded-inherit animate-ping bg-[#00F2FF]/20 scale-125 opacity-0 group-hover:opacity-100" />
                     <div className="absolute inset-0 rounded-inherit animate-pulse bg-[#00F2FF]/10" />
                   </div>
-                  <span className="font-mono text-sm font-bold tracking-wider text-white drop-shadow-[0_0_8px_rgba(0,242,255,0.3)]">{settings.contact.phone}</span>
+                  <span className="font-mono text-xs font-bold tracking-[0.2em] uppercase text-white/80 group-hover:text-[#00F2FF] drop-shadow-[0_0_8px_rgba(0,242,255,0.3)] transition-colors">{settings.contact.phone}</span>
                 </a>
               </li>
               <li className="flex flex-col gap-2 transition-colors group">
@@ -61,7 +61,7 @@ export function Contact() {
                   <div className="flex items-center justify-center w-8 h-8 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 text-[#00F2FF] hover:bg-[#00F2FF]/20 transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] group-hover:shadow-[0_0_20px_rgba(0,242,255,0.3)] shrink-0">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <span className="font-mono text-[10px] tracking-[0.4em] text-[#00F2FF]/60 uppercase group-hover:text-[#00F2FF] transition-colors">
+                  <span className="font-mono text-xs font-bold tracking-[0.2em] uppercase text-white/80 group-hover:text-[#00F2FF] drop-shadow-[0_0_8px_rgba(0,242,255,0.3)] transition-colors">
                     Direct Inquiry
                   </span>
                 </a>
@@ -91,7 +91,7 @@ export function Contact() {
                 <div className="flex items-center justify-center w-8 h-8 rounded border border-[#00F2FF]/20 bg-[#00F2FF]/5 text-[#00F2FF] group-hover:bg-[#00F2FF]/20 transition-all shadow-[0_0_10px_rgba(0,242,255,0.1)] group-hover:shadow-[0_0_15px_rgba(0,242,255,0.3)] shrink-0">
                   <MapPin className="w-4 h-4" />
                 </div>
-                <span className="font-mono text-sm font-bold tracking-wider text-[#00F2FF] drop-shadow-[0_0_8px_rgba(0,242,255,0.3)]">{settings.contact.location}</span>
+                <span className="font-mono text-xs font-bold tracking-[0.2em] uppercase text-white/80 group-hover:text-[#00F2FF] drop-shadow-[0_0_8px_rgba(0,242,255,0.3)] transition-colors">{settings.contact.location}</span>
               </li>
             </ul>
             <div className="flex items-center gap-4 mt-auto pt-6 border-t border-[#00F2FF]/10">
