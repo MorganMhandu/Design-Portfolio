@@ -190,12 +190,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     init();
   }, []);
 
-  // ── 2. Fetch from cloud in the background, but ONLY if cloud data is newer ──
+  // ── 2. Smart sync: pull from cloud only if newer, otherwise push local to cloud ──
   useEffect(() => {
     if (!initialized) return;
     
-    async function performCloudSync() {
-      // Use a timestamp to bust Chrome/Edge browser cache for the API call
+    async function performSmartSync() {
       const timestamp = Date.now();
       setSyncStatus("syncing");
       
@@ -203,40 +202,46 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         const res = await fetch(`/api/admin/data?t=${timestamp}`);
         if (!res.ok) throw new Error("Cloud fetch failed");
         
-        const data = await res.json();
-        if (data && !data.error) {
-          // Check timestamps: only overwrite if cloud data is newer than local data
-          const localData = await loadFromStorage();
-          const localTs = localData?.lastUpdated ? new Date(localData.lastUpdated).getTime() : 0;
-          const cloudTs = data.lastUpdated ? new Date(data.lastUpdated).getTime() : 0;
-          
-          // If local data is newer (user just made changes), skip overwrite
-          if (localTs > cloudTs) {
-            console.log("Local data is newer than cloud — skipping overwrite to preserve fresh changes.");
-            setSyncStatus("idle");
-            return;
-          }
+        const cloudData = await res.json();
+        if (!cloudData || cloudData.error) {
+          setSyncStatus("idle");
+          return;
+        }
 
-          // Cloud is newer or equal — safe to update local state
-          if (Array.isArray(data.projects)) setProjects(data.projects);
-          if (Array.isArray(data.pillars)) setPillars(data.pillars);
-          if (Array.isArray(data.reports)) setReports(data.reports);
-          if (Array.isArray(data.messages)) setMessages(data.messages);
-          if (Array.isArray(data.systems)) setSystems(data.systems);
-          if (data.settings) setSettings(data.settings);
-          
-          // Update local storage to match cloud
-          await saveToStorage(data);
+        // Check timestamps: compare cloud vs local
+        const localData = await loadFromStorage();
+        const localTs = localData?.lastUpdated ? new Date(localData.lastUpdated).getTime() : 0;
+        const cloudTs = cloudData.lastUpdated ? new Date(cloudData.lastUpdated).getTime() : 0;
+        
+        if (localTs > cloudTs && localData) {
+          // Local is NEWER — push local data to cloud to make it authoritative
+          console.log("Local data is newer — pushing to cloud to sync other browsers.");
+          await fetch("/api/admin/data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(localData),
+          });
+          setSyncStatus("success");
+          setTimeout(() => setSyncStatus("idle"), 2000);
+        } else {
+          // Cloud is newer or equal — update local state from cloud
+          if (Array.isArray(cloudData.projects)) setProjects(cloudData.projects);
+          if (Array.isArray(cloudData.pillars)) setPillars(cloudData.pillars);
+          if (Array.isArray(cloudData.reports)) setReports(cloudData.reports);
+          if (Array.isArray(cloudData.messages)) setMessages(cloudData.messages);
+          if (Array.isArray(cloudData.systems)) setSystems(cloudData.systems);
+          if (cloudData.settings) setSettings(cloudData.settings);
+          await saveToStorage(cloudData);
           setSyncStatus("success");
           setTimeout(() => setSyncStatus("idle"), 2000);
         }
       } catch (err) {
-        console.warn("Cloud sync failed, staying with local data.");
+        console.warn("Smart sync failed, staying with local data.");
         setSyncStatus("idle");
       }
     }
     
-    performCloudSync();
+    performSmartSync();
   }, [initialized]);
 
   // ── Sync Helper: saves to localStorage immediately, then tries cloud ──
