@@ -62,36 +62,37 @@ function ReportForm({
     setUploadStatus(`Uploading ${file.name}...`);
 
     try {
-      // First, try the cloud upload API
-      const formData = new FormData();
-      formData.append("files", file);
-      formData.append("folder", "portfolio/reports");
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const filename = `portfolio/reports/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
 
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const data = await res.json();
+      const presignRes = await fetch("/api/admin/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename })
+      });
+      const presignData = await presignRes.json();
 
-      if (res.ok && data.urls) {
-        set("cloudUrl", data.urls[0]);
-        set("fileName", file.name);
-        setUploadStatus(null);
-        setIsUploading(false);
-        return;
+      if (!presignRes.ok || presignData.error) {
+        throw new Error(presignData.error || "Failed to get upload URL");
       }
-    } catch {
-      // Cloud unavailable — fall through to local base64 fallback
-    }
 
-    // Fallback: convert to base64 data URL
-    const b64 = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => resolve(ev.target?.result as string);
-      reader.readAsDataURL(file);
-    });
-    
-    set("cloudUrl", b64);
-    set("fileName", file.name);
-    setIsUploading(false);
-    setUploadStatus(null);
+      const uploadRes = await fetch(presignData.signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file
+      });
+
+      if (!uploadRes.ok) throw new Error("Failed to upload report");
+
+      set("cloudUrl", presignData.publicUrl);
+      set("fileName", file.name);
+      setUploadStatus(null);
+      setIsUploading(false);
+    } catch (err: any) {
+      alert(`Upload failed: ${err.message}`);
+      setIsUploading(false);
+      setUploadStatus(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

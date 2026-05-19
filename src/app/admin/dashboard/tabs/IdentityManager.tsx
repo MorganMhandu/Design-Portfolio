@@ -45,20 +45,35 @@ export function IdentityManager() {
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("files", file);
 
     try {
-      const res = await fetch("/api/admin/upload", {
+      const folder = field === "profilePicture" ? "portfolio/identity/images" : "portfolio/identity/videos";
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const filename = `${folder}/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
+
+      const presignRes = await fetch("/api/admin/presign", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename })
       });
-      const data = await res.json();
-      if (data.urls && data.urls.length > 0) {
-        handleChange(field, data.urls[0]);
+      const presignData = await presignRes.json();
+
+      if (!presignRes.ok || presignData.error) {
+        throw new Error(presignData.error || "Failed to get upload URL");
       }
-    } catch (error) {
+
+      const uploadRes = await fetch(presignData.signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file
+      });
+
+      if (!uploadRes.ok) throw new Error("Failed to upload identity asset");
+
+      handleChange(field, presignData.publicUrl);
+    } catch (error: any) {
       console.error("Upload failed:", error);
+      alert(`Upload failed: ${error.message}`);
     } finally {
       setUploading(false);
     }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdmin, DigitalSystem } from "@/context/AdminContext";
-import { Plus, Edit2, Trash2, X, LayoutTemplate, Link as LinkIcon, Save, Layers } from "lucide-react";
+import { Plus, Edit2, Trash2, X, LayoutTemplate, Link as LinkIcon, Save, Layers, Camera, Loader2 } from "lucide-react";
 
 const emptySystem = (): Omit<DigitalSystem, "id"> => ({
   title: "",
@@ -17,8 +17,58 @@ const emptySystem = (): Omit<DigitalSystem, "id"> => ({
 function SystemForm({ initial, onSave, onCancel, title }: { initial: Omit<DigitalSystem, "id">; onSave: (s: Omit<DigitalSystem, "id">) => void; onCancel: () => void; title: string; }) {
   const [form, setForm] = useState(initial);
   const [techInput, setTechInput] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
   const set = (key: keyof typeof form, val: any) => setForm((prev) => ({ ...prev, [key]: val }));
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "videoUrl") => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    setIsUploading(true);
+    setUploadStatus(`Uploading ${field}...`);
+
+    const files = Array.from(e.target.files);
+
+    try {
+      const folder = "portfolio/systems/videos";
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        const filename = `${folder}/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
+
+        const presignRes = await fetch("/api/admin/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename })
+        });
+        const presignData = await presignRes.json();
+
+        if (!presignRes.ok || presignData.error) {
+          throw new Error(presignData.error || "Failed to get upload URL");
+        }
+
+        const uploadRes = await fetch(presignData.signedUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
+
+        if (!uploadRes.ok) throw new Error(`Failed to upload ${file.name}`);
+
+        uploadedUrls.push(presignData.publicUrl);
+      }
+
+      set(field, uploadedUrls[0]);
+      setUploadStatus(null);
+      setIsUploading(false);
+    } catch (err: any) {
+      alert(`Upload failed: ${err.message}`);
+      setIsUploading(false);
+      setUploadStatus(null);
+    }
+  };
 
   const addTech = () => {
     if (techInput.trim() && !form.techStack.includes(techInput.trim())) {
@@ -60,8 +110,17 @@ function SystemForm({ initial, onSave, onCancel, title }: { initial: Omit<Digita
             <input type="number" value={form.order?.toString() || "0"} onChange={(e) => set("order", parseInt(e.target.value) || 0)} placeholder="e.g., 1" className="bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase">Video URL (YouTube/Vimeo/MP4)</label>
-            <input type="text" value={form.videoUrl || ""} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://..." className="bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
+            <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
+              <span>Video URL or Upload</span>
+              {isUploading && uploadStatus?.includes("videoUrl") && <Loader2 className="w-3 h-3 text-[#00F2FF] animate-spin" />}
+            </label>
+            <div className="flex items-center gap-2">
+              <input type="text" value={form.videoUrl || ""} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://..." className="flex-1 bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
+              <label className="cursor-pointer bg-[#00F2FF]/10 text-[#00F2FF] border border-[#00F2FF]/30 px-3 py-2.5 rounded-lg hover:bg-[#00F2FF]/20 transition-all">
+                <Camera className="w-4 h-4" />
+                <input type="file" accept="video/mp4,video/webm" onChange={(e) => handleFileUpload(e, "videoUrl")} className="hidden" disabled={isUploading} />
+              </label>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -81,7 +140,10 @@ function SystemForm({ initial, onSave, onCancel, title }: { initial: Omit<Digita
         </div>
         <div className="flex gap-3 justify-end mt-2">
           <button type="button" onClick={onCancel} className="px-5 py-2 font-mono text-xs tracking-widest uppercase text-[#94A3B8] border border-white/10 rounded-lg hover:border-white/30 transition-colors">Cancel</button>
-          <button type="submit" className="px-6 py-2 font-mono text-xs tracking-widest uppercase bg-[#00F2FF] text-black font-bold rounded-lg hover:bg-[#00F2FF]/80 shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all flex items-center gap-2"><Save className="w-3 h-3" /> Save System</button>
+          <button type="submit" disabled={isUploading} className="px-6 py-2 font-mono text-xs tracking-widest uppercase bg-[#00F2FF] text-black font-bold rounded-lg hover:bg-[#00F2FF]/80 shadow-[0_0_15px_rgba(0,242,255,0.3)] transition-all flex items-center gap-2 disabled:opacity-50">
+            {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} 
+            Save System
+          </button>
         </div>
       </form>
     </div>

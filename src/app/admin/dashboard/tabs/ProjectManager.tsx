@@ -63,7 +63,7 @@ function ProjectForm({
   const set = (key: keyof typeof form, val: any) =>
     setForm((prev) => ({ ...prev, [key]: val }));
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "zipUrl" | "pdfUrl") => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "zipUrl" | "pdfUrl" | "videoUrl") => {
     if (!e.target.files || e.target.files.length === 0) return;
 
     setIsUploading(true);
@@ -72,57 +72,47 @@ function ProjectForm({
     const files = Array.from(e.target.files);
 
     try {
-      // First, try the cloud upload API
-      const formData = new FormData();
-      files.forEach(file => formData.append("files", file));
-      formData.append("folder", field === "images" ? "portfolio/projects/renders" : field === "zipUrl" ? "portfolio/projects/zip" : "portfolio/projects/pdf");
+      const folder = field === "images" ? "portfolio/projects/renders" : field === "zipUrl" ? "portfolio/projects/zip" : field === "videoUrl" ? "portfolio/projects/videos" : "portfolio/projects/pdf";
+      const uploadedUrls: string[] = [];
 
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      const data = await res.json();
-
-      if (res.ok && data.urls) {
-        // Cloud upload success
-        if (field === "images") {
-          set("images", [...form.images, ...data.urls]);
-        } else {
-          set(field, data.urls[0]);
-        }
-        setUploadStatus(null);
-        setIsUploading(false);
-        return;
-      } else {
-        alert(`Cloud upload failed: ${data.error || 'Unknown error'}. Falling back to local encoding (This may break sync if file is >4MB).`);
-      }
-    } catch (err: any) {
-      alert(`Cloud upload exception: ${err.message}. Falling back to local encoding.`);
-      // Cloud unavailable — fall through to local base64 fallback
-    }
-
-    // Fallback: convert to base64 data URLs (works without Supabase)
-    if (field === "images") {
-      const base64Urls: string[] = [];
       for (const file of files) {
-        const b64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (ev) => resolve(ev.target?.result as string);
-          reader.readAsDataURL(file);
-        });
-        base64Urls.push(b64);
-      }
-      set("images", [...form.images, ...base64Urls]);
-    } else {
-      // Convert PDF/ZIP to base64 so it can be downloaded locally
-      const file = files[0];
-      const b64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => resolve(ev.target?.result as string);
-        reader.readAsDataURL(file);
-      });
-      set(field, b64);
-    }
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        const filename = `${folder}/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
 
-    setIsUploading(false);
-    setUploadStatus(null);
+        const presignRes = await fetch("/api/admin/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename })
+        });
+        const presignData = await presignRes.json();
+
+        if (!presignRes.ok || presignData.error) {
+          throw new Error(presignData.error || "Failed to get upload URL");
+        }
+
+        const uploadRes = await fetch(presignData.signedUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
+
+        if (!uploadRes.ok) throw new Error(`Failed to upload ${file.name}`);
+
+        uploadedUrls.push(presignData.publicUrl);
+      }
+
+      if (field === "images") {
+        set("images", [...form.images, ...uploadedUrls]);
+      } else {
+        set(field, uploadedUrls[0]);
+      }
+      setUploadStatus(null);
+      setIsUploading(false);
+    } catch (err: any) {
+      alert(`Upload failed: ${err.message}`);
+      setIsUploading(false);
+      setUploadStatus(null);
+    }
   };
 
   const removeImage = (idx: number) =>
@@ -152,7 +142,19 @@ function ProjectForm({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputField label="Display Order (0 = First)" value={form.order?.toString() || "0"} onChange={(v) => set("order", parseInt(v) || 0)} placeholder="e.g., 1" />
-          <InputField label="Video URL (YouTube/Vimeo/MP4)" value={form.videoUrl || ""} onChange={(v) => set("videoUrl", v)} placeholder="https://..." />
+          <div className="flex flex-col gap-1.5">
+            <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
+              <span>Video URL or Upload</span>
+              {isUploading && uploadStatus?.includes("videoUrl") && <Loader2 className="w-3 h-3 text-[#00F2FF] animate-spin" />}
+            </label>
+            <div className="flex items-center gap-2">
+              <input type="text" value={form.videoUrl || ""} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://..." className="flex-1 bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
+              <label className="cursor-pointer bg-[#00F2FF]/10 text-[#00F2FF] border border-[#00F2FF]/30 px-3 py-2.5 rounded-lg hover:bg-[#00F2FF]/20 transition-all">
+                <Camera className="w-4 h-4" />
+                <input type="file" accept="video/mp4,video/webm" onChange={(e) => handleFileUpload(e, "videoUrl")} className="hidden" disabled={isUploading} />
+              </label>
+            </div>
+          </div>
         </div>
         <InputField label="Mechanical Components" value={form.components} onChange={(v) => set("components", v)} placeholder="e.g., Jaw Crusher Frame, Impact Rotors" required />
         <InputField label="Automation Stack" value={form.automation} onChange={(v) => set("automation", v)} placeholder="e.g., PLC Load Monitoring, Proximity Sensors" required />
@@ -318,20 +320,37 @@ function ProjectForm({
                   let url = "";
                   
                   try {
-                    const formData = new FormData();
-                    formData.append("files", file);
-                    formData.append("folder", "portfolio/projects/reports");
-                    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-                    const data = await res.json();
-                    if (res.ok && data.urls) url = data.urls[0];
-                  } catch {}
+                    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+                    const filename = `portfolio/projects/reports/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
+
+                    const presignRes = await fetch("/api/admin/presign", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ filename })
+                    });
+                    const presignData = await presignRes.json();
+
+                    if (presignRes.ok && presignData.signedUrl) {
+                      const uploadRes = await fetch(presignData.signedUrl, {
+                        method: "PUT",
+                        headers: { "Content-Type": file.type },
+                        body: file
+                      });
+                      if (uploadRes.ok) {
+                        url = presignData.publicUrl;
+                      }
+                    }
+                  } catch (err) {
+                    console.error("Report upload failed", err);
+                    alert("Report upload failed");
+                    setIsUploading(false);
+                    return;
+                  }
 
                   if (!url) {
-                    url = await new Promise<string>((resolve) => {
-                      const reader = new FileReader();
-                      reader.onload = (ev) => resolve(ev.target?.result as string);
-                      reader.readAsDataURL(file);
-                    });
+                     alert("Failed to get upload URL");
+                     setIsUploading(false);
+                     return;
                   }
 
                   const newReport = { id: `rep-${Date.now()}`, title: titleInput.value, url };
