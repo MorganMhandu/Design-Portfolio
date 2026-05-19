@@ -92,25 +92,29 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
           <div className="w-full md:w-1/2 relative min-h-[300px] bg-[#000814] border-b md:border-b-0 md:border-r border-[#00F2FF]/10 flex items-center justify-center group/carousel overflow-hidden">
             {project.images && project.images.length > 0 ? (
               <>
-                <AnimatePresence mode="wait">
+                {project.images.map((img, i) => (
                   <motion.div
-                    key={currentImageIndex}
+                    key={i}
                     initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.02 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    animate={{ 
+                      opacity: i === currentImageIndex ? 1 : 0,
+                      scale: i === currentImageIndex ? 1 : 0.98,
+                    }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
                     className="absolute inset-0 w-full h-full p-4"
+                    style={{ pointerEvents: i === currentImageIndex ? "auto" : "none" }}
                   >
                     <Image 
-                      src={project.images[currentImageIndex]} 
-                      alt={`${project.title} - Render ${currentImageIndex + 1}`} 
+                      src={img} 
+                      alt={`${project.title} - Render ${i + 1}`} 
                       fill
                       className="object-contain"
-                      priority
+                      priority={i === 0}
+                      unoptimized
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </motion.div>
-                </AnimatePresence>
+                ))}
                 
                 {project.images.length > 1 && (
                   <>
