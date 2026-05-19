@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
-import { FileText, FileBarChart, ChevronLeft, ChevronRight, X, ChevronDown } from "lucide-react";
+import { FileText, FileBarChart, ChevronLeft, ChevronRight, X, ChevronDown, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
 
@@ -136,6 +136,13 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
             <h2 className="text-2xl font-bold tracking-tight text-white mb-6">
               {project.title}
             </h2>
+
+            {project.videoUrl && (
+              <a href={project.videoUrl} target="_blank" rel="noreferrer" className="flex w-max items-center gap-2 px-4 py-2 bg-[#00F2FF]/10 text-[#00F2FF] border border-[#00F2FF]/30 rounded-lg hover:bg-[#00F2FF]/20 transition-all font-mono text-[10px] tracking-widest uppercase mb-6">
+                <PlayCircle className="w-4 h-4" />
+                Watch Project Video
+              </a>
+            )}
 
             <div className="space-y-5 mb-8 flex-grow">
               <div className="flex flex-col gap-1">
@@ -324,7 +331,9 @@ export function CaseStudies() {
     setRefreshKey(prev => prev + 1);
   }, [projects]);
 
-  const validProjects = projects.filter(p => p.title || p.focus || p.components || p.automation);
+  const validProjects = [...projects]
+    .filter(p => p.title || p.focus || p.components || p.automation)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
   const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   return (

@@ -16,6 +16,8 @@ const emptyProject = (): Omit<CaseProject, "id"> => ({
   zipUrl: "",
   pdfUrl: "",
   reports: [],
+  order: 0,
+  videoUrl: "",
 });
 
 function InputField({
@@ -147,6 +149,10 @@ function ProjectForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputField label="Project Title" value={form.title} onChange={(v) => set("title", v)} placeholder="e.g., Smart Crushing Station" required />
           <InputField label="System Focus" value={form.focus} onChange={(v) => set("focus", v)} placeholder="e.g., Throughput Maximization" required />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField label="Display Order (0 = First)" value={form.order?.toString() || "0"} onChange={(v) => set("order", parseInt(v) || 0)} placeholder="e.g., 1" />
+          <InputField label="Video URL (YouTube/Vimeo/MP4)" value={form.videoUrl || ""} onChange={(v) => set("videoUrl", v)} placeholder="https://..." />
         </div>
         <InputField label="Mechanical Components" value={form.components} onChange={(v) => set("components", v)} placeholder="e.g., Jaw Crusher Frame, Impact Rotors" required />
         <InputField label="Automation Stack" value={form.automation} onChange={(v) => set("automation", v)} placeholder="e.g., PLC Load Monitoring, Proximity Sensors" required />

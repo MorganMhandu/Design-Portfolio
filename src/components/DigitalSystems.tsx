@@ -1,11 +1,13 @@
 "use client";
 
 import { Section, SectionHeading } from "./Section";
-import { Code, LayoutTemplate } from "lucide-react";
+import { Code, LayoutTemplate, PlayCircle } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
 
 export function DigitalSystems() {
   const { systems } = useAdmin();
+  
+  const sortedSystems = [...systems].sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
     <Section id="digital-systems">
@@ -13,7 +15,7 @@ export function DigitalSystems() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         
-        {systems.map((sys) => (
+        {sortedSystems.map((sys) => (
           <div key={sys.id} className="flex flex-col border border-[#00F2FF]/20 bg-background/50 p-8 rounded-max hover:border-[#00F2FF]/50 transition-all duration-300 group shadow-[rgba(0,242,255,0.05)_0px_0px_20px] relative overflow-hidden">
             
             <Code className="w-10 h-10 text-[#00F2FF] mb-6 group-hover:scale-110 transition-transform" strokeWidth={1.5} />
@@ -36,7 +38,7 @@ export function DigitalSystems() {
               {sys.description}
             </p>
 
-            <div className="mt-auto pt-6 border-t border-muted/50">
+            <div className="mt-auto pt-6 border-t border-muted/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                <a 
                  href={sys.link.startsWith('http') ? sys.link : `https://${sys.link}`} 
                  target="_blank"
@@ -46,6 +48,17 @@ export function DigitalSystems() {
                  <LayoutTemplate className="w-4 h-4" />
                  Launch Application
                </a>
+               {sys.videoUrl && (
+                 <a 
+                   href={sys.videoUrl} 
+                   target="_blank"
+                   rel="noreferrer"
+                   className="flex items-center gap-2 text-xs font-mono tracking-widest text-[#00F2FF] hover:text-white uppercase transition-colors"
+                 >
+                   <PlayCircle className="w-4 h-4" />
+                   Watch Demo
+                 </a>
+               )}
             </div>
           </div>
         ))}

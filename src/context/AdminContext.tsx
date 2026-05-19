@@ -18,6 +18,8 @@ export type CaseProject = {
   zipUrl?: string;
   pdfUrl?: string; // Legacy single report
   reports?: { id: string; title: string; url: string }[];
+  order?: number;
+  videoUrl?: string;
 };
 
 export type Pillar = {
@@ -54,6 +56,8 @@ export type DigitalSystem = {
   description: string;
   link: string;
   version: string;
+  order?: number;
+  videoUrl?: string;
 };
 
 export type AdminSettings = {

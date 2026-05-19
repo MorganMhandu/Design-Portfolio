@@ -10,6 +10,8 @@ const emptySystem = (): Omit<DigitalSystem, "id"> => ({
   description: "",
   link: "#",
   version: "V1.0",
+  order: 0,
+  videoUrl: "",
 });
 
 function SystemForm({ initial, onSave, onCancel, title }: { initial: Omit<DigitalSystem, "id">; onSave: (s: Omit<DigitalSystem, "id">) => void; onCancel: () => void; title: string; }) {
@@ -51,6 +53,16 @@ function SystemForm({ initial, onSave, onCancel, title }: { initial: Omit<Digita
         <div className="flex flex-col gap-1.5">
           <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase">Launch Link / URL</label>
           <input type="text" value={form.link} onChange={(e) => set("link", e.target.value)} placeholder="https://..." className="bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase">Display Order (0 = First)</label>
+            <input type="number" value={form.order?.toString() || "0"} onChange={(e) => set("order", parseInt(e.target.value) || 0)} placeholder="e.g., 1" className="bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase">Video URL (YouTube/Vimeo/MP4)</label>
+            <input type="text" value={form.videoUrl || ""} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://..." className="bg-black/40 border border-[#00F2FF]/20 rounded-lg px-3 py-2.5 font-mono text-xs text-white focus:outline-none focus:border-[#00F2FF]/70 transition-all placeholder:text-white/20" />
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase">Tech Stack</label>
