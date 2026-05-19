@@ -343,7 +343,7 @@ export function CaseStudies() {
   return (
     <Section id="projects">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-        <SectionHeading>Technical Case Studies</SectionHeading>
+        <SectionHeading>Technical Projects</SectionHeading>
         
         {syncStatus === "syncing" && (
           <div className="flex items-center gap-2 px-3 py-1 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-full animate-pulse">

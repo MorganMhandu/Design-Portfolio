@@ -16,7 +16,7 @@ const SESSION_DURATION_MS = 30 * 60 * 1000;
 type TabId = "projects" | "capabilities" | "systems" | "inquiries" | "identity" | "contact";
 
 const TABS: { id: TabId; label: string; sublabel: string; icon: React.ElementType }[] = [
-  { id: "projects", label: "Project Manager", sublabel: "Technical Case Studies", icon: FolderKanban },
+  { id: "projects", label: "Project Manager", sublabel: "Technical Projects", icon: FolderKanban },
   { id: "capabilities", label: "Capability Matrix", sublabel: "Skill Pillars", icon: LayoutGrid },
   { id: "systems", label: "Digital Asset Manager", sublabel: "Web & Digital Infrastructure", icon: Cpu },
   { id: "inquiries", label: "Inquiry Log", sublabel: "Engage Terminal Messages", icon: MessageSquare },
