@@ -112,7 +112,7 @@ export function Hero() {
         {/* Left Column (58% width) */}
         <div className="w-full lg:w-[58%] flex flex-col items-start justify-center">
           
-          {/* Integrated Biometric ID + Status + Name Row */}
+          {/* Profile Picture + Name Group */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,45 +120,31 @@ export function Hero() {
             className="flex items-center gap-5 mb-5"
           >
             {settings.showProfilePicture && (
-              <div className="relative group shrink-0">
-                {/* Border with Metallic Titanium Gradient & Cyan Glow */}
-                <div className="relative w-20 h-20 p-[2px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#BFC9D2] via-[#94A3B8] to-[#DCE3EA] shadow-[0_0_20px_rgba(0,242,255,0.25)] group-hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all duration-500">
-                  <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-[#020617]">
-                    {/* Headshot Image */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={settings.profilePicture || "/images/headshot.jpg"} 
-                      alt="Morgan Mhandu Profile" 
-                      className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-700"
-                      key={refreshKey}
-                    />
-                    <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(0,242,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,242,255,0.05)_1px,transparent_1px)] bg-[size:4px_4px]" />
-                  </div>
+              <div className="relative shrink-0">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-[#020617] border border-white/10 shadow-[0_0_20px_rgba(0,242,255,0.15)]">
+                  {/* Headshot Image */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={settings.profilePicture || "/images/headshot.jpg"} 
+                    alt="Morgan Michael Mhandu" 
+                    className="w-full h-full object-cover"
+                    key={refreshKey}
+                  />
                 </div>
-                
-                {/* Corner reticle marks */}
-                <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#00F2FF]" />
-                <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#00F2FF]" />
               </div>
             )}
 
             <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse" />
-                <span className="font-mono text-[10px] text-[#00F2FF] tracking-[0.25em] uppercase font-semibold">
-                  STATUS: ONLINE // HARARE, ZW
-                </span>
-              </div>
               <h2 className="text-xl sm:text-2xl font-heading font-bold text-white tracking-tight">
                 Morgan Michael Mhandu
               </h2>
-              <span className="font-mono text-xs text-[#94A3B8] tracking-widest uppercase">
-                PORTFOLIO // SPECIFICATION INDEX
+              <span className="font-mono text-xs text-[#94A3B8] tracking-wider">
+                Harare, Zimbabwe
               </span>
             </div>
           </motion.div>
 
-          {/* Line 2 & 3: Main Title with Engineered Precision Heading */}
+          {/* Main Title */}
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -166,37 +152,37 @@ export function Hero() {
             className="font-heading font-bold leading-[1.08] tracking-tight mb-5 text-[2.4rem] sm:text-[3.2rem] lg:text-[3.8rem] text-white"
           >
             Mechanical Systems &amp; <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2FF] via-white to-[#94A3B8] drop-shadow-[0_0_20px_rgba(0,242,255,0.35)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2FF] via-white to-[#94A3B8]">
               Automation Engineer
             </span>
           </motion.h1>
 
-          {/* Line 4: Discipline Badges */}
+          {/* Discipline Badges */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-wrap gap-2.5 mb-6"
           >
-            <span className="font-mono text-[#00F2FF] font-semibold tracking-wider uppercase bg-[#00F2FF]/10 border border-[#00F2FF]/40 px-3 py-1 text-[10px] sm:text-xs rounded-md shadow-[0_0_10px_rgba(0,242,255,0.15)]">
-              HEAVY INDUSTRIAL CAD
+            <span className="font-mono text-[#00F2FF] font-medium tracking-wider uppercase bg-[#00F2FF]/10 border border-[#00F2FF]/30 px-3 py-1 text-[10px] sm:text-xs rounded-md">
+              Mechanical Design
             </span>
-            <span className="font-mono text-white/90 font-semibold tracking-wider uppercase bg-white/5 border border-white/20 px-3 py-1 text-[10px] sm:text-xs rounded-md">
-              FEA SIMULATION
+            <span className="font-mono text-white/90 font-medium tracking-wider uppercase bg-white/5 border border-white/15 px-3 py-1 text-[10px] sm:text-xs rounded-md">
+              FEA Simulation
             </span>
-            <span className="font-mono text-[#FF5400] font-semibold tracking-wider uppercase bg-[#FF5400]/10 border border-[#FF5400]/40 px-3 py-1 text-[10px] sm:text-xs rounded-md">
-              FULL-STACK AUTOMATION
+            <span className="font-mono text-[#FF5400] font-medium tracking-wider uppercase bg-[#FF5400]/10 border border-[#FF5400]/30 px-3 py-1 text-[10px] sm:text-xs rounded-md">
+              Industrial Automation
             </span>
           </motion.div>
 
-          {/* Line 5: Description */}
+          {/* Narrative */}
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-base sm:text-lg text-[#94A3B8] leading-relaxed max-w-[540px] mb-8 font-light"
           >
-            Designing intelligent physical systems and full-stack digital architectures by synthesizing <span className="text-[#00F2FF] font-medium">industrial engineering</span>, <span className="text-[#00F2FF] font-medium">high-tolerance CAD</span>, and <span className="text-[#00F2FF] font-medium">modern web software</span>.
+            Designing intelligent physical systems and automation solutions by integrating mechanical engineering, high-tolerance CAD, and modern software tooling.
           </motion.p>
 
           {/* Action CTAs */}
@@ -206,40 +192,33 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-wrap gap-4 mt-2 font-mono text-xs"
           >
-            <a href="#projects" className="px-8 py-3.5 bg-gradient-to-r from-white to-[#00F2FF] text-black font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-cad-glow uppercase tracking-wider">
-              Explore Case Studies
+            <a href="#projects" className="px-8 py-3.5 bg-[#00F2FF] text-black font-bold rounded-xl transition-all duration-300 hover:bg-[#00F2FF]/90 uppercase tracking-wider shadow-[0_0_20px_rgba(0,242,255,0.25)]">
+              Explore Projects
             </a>
-            <a href="#capabilities" className="px-6 py-3.5 border border-[#1F2937] bg-[#0B0F17]/80 text-[#94A3B8] hover:text-white rounded-xl hover:border-[#00F2FF]/50 hover:bg-[#00F2FF]/5 transition-all uppercase tracking-wider">
-              Technical Matrix
+            <a href="#capabilities" className="px-6 py-3.5 border border-[#1F2937] bg-[#0B0F17]/80 text-[#94A3B8] hover:text-white rounded-xl hover:border-[#00F2FF]/40 transition-all uppercase tracking-wider">
+              Technical Capabilities
             </a>
           </motion.div>
 
         </div>
 
-        {/* Right Column (42% width) - Interactive Video Screen */}
+        {/* Right Column (42% width) - Seamless Video Blending */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.3 }}
-          className="w-full lg:w-[42%] flex justify-center items-center relative aspect-[16/10] bg-black/60 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(0,242,255,0.12)] backdrop-blur-md group"
+          className="w-full lg:w-[42%] flex justify-center items-center relative aspect-[16/10] overflow-hidden group"
         >
           {settings.heroVideo ? (
-            <div className="relative w-full h-full">
+            <div className="relative w-full h-full flex items-center justify-center">
               <video 
                 src={settings.heroVideo}
                 autoPlay 
                 loop 
                 muted 
                 playsInline
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                className="w-full h-full object-contain [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-95 group-hover:opacity-100 transition-opacity duration-700"
               />
-              {/* Technical HUD Overlay on Video */}
-              <div className="absolute inset-0 pointer-events-none border-[1px] border-[#00F2FF]/20 m-4 rounded-xl" />
-              <div className="absolute bottom-6 right-6 opacity-30">
-                <PlayCircle className="w-6 h-6 text-[#00F2FF]" />
-              </div>
-              {/* Scanline Effect */}
-              <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_2px,3px_100%]" />
             </div>
           ) : (
             <WireframeAssembly />

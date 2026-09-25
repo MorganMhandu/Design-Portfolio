@@ -36,17 +36,12 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Token */}
         <a href="#" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-lg bg-[#00F2FF]/10 border border-[#00F2FF]/40 flex items-center justify-center text-[#00F2FF] font-mono text-xs font-bold group-hover:bg-[#00F2FF] group-hover:text-black transition-all shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+          <div className="w-8 h-8 rounded-lg bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] font-mono text-xs font-bold group-hover:bg-[#00F2FF] group-hover:text-black transition-all">
             MM
           </div>
-          <div className="flex flex-col">
-            <span className="font-heading font-bold text-sm text-white tracking-wider">
-              MORGAN MHANDU
-            </span>
-            <span className="font-mono text-[9px] text-[#94A3B8] tracking-widest uppercase">
-              MECH // SYSTEMS
-            </span>
-          </div>
+          <span className="font-heading font-bold text-sm text-white tracking-wider">
+            MORGAN MHANDU
+          </span>
         </a>
 
         {/* Desktop Navigation Links */}
@@ -67,10 +62,9 @@ export function Navigation() {
         <div className="hidden md:flex items-center gap-4">
           <a
             href="#contact"
-            className="px-4 py-2 rounded-lg bg-[#00F2FF]/10 border border-[#00F2FF]/30 text-[#00F2FF] font-mono text-xs uppercase tracking-wider hover:bg-[#00F2FF] hover:text-black transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-[#00F2FF]/10 border border-[#00F2FF]/30 text-[#00F2FF] font-mono text-xs uppercase tracking-wider hover:bg-[#00F2FF] hover:text-black transition-all"
           >
-            <Terminal className="w-3.5 h-3.5" />
-            Initiate Contact
+            Contact
           </a>
         </div>
 
@@ -104,7 +98,7 @@ export function Navigation() {
             onClick={() => setMobileMenuOpen(false)}
             className="w-full text-center py-3 rounded-lg bg-[#00F2FF] text-black font-bold uppercase tracking-wider text-xs mt-2"
           >
-            Initiate Contact
+            Contact
           </a>
         </div>
       )}
