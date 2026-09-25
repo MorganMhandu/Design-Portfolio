@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Section, SectionHeading } from "./Section";
 import { Mail, Linkedin, Github, MapPin, X } from "lucide-react";
 import { useAdmin } from "@/context/AdminContext";
@@ -14,6 +14,8 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 export function Contact() {
   const { settings } = useAdmin();
   const [showEmailFallback, setShowEmailFallback] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const contactVideoSrc = settings.contactVideo || "/assets/automation.mp4";
 
   useEffect(() => {
     if (showEmailFallback) {
@@ -22,11 +24,38 @@ export function Contact() {
     }
   }, [showEmailFallback]);
 
+  // Robust Autoplay handling across all browsers
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.defaultMuted = true;
+    video.muted = true;
+    video.playsInline = true;
+
+    const playVideo = () => {
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          const startPlayback = () => {
+            video.play();
+            window.removeEventListener("touchstart", startPlayback);
+            window.removeEventListener("click", startPlayback);
+            window.removeEventListener("scroll", startPlayback);
+          };
+          window.addEventListener("touchstart", startPlayback, { once: true });
+          window.addEventListener("click", startPlayback, { once: true });
+          window.addEventListener("scroll", startPlayback, { once: true });
+        });
+      }
+    };
+
+    playVideo();
+  }, [contactVideoSrc]);
+
   const handleEmailClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // 1. Primary Action: Try to open default mail client
     window.location.href = `mailto:${settings.contact.email}?subject=Engineering Inquiry`;
-    // 2. Fallback UI: Show the Gmail deep link in case the primary action fails
     setShowEmailFallback(true);
   };
 
@@ -39,9 +68,9 @@ export function Contact() {
           <SectionHeading>Engage</SectionHeading>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-16 md:gap-24">
+        <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
           {/* Left Column */}
-          <div className="md:w-1/2 flex flex-col border-l border-[#00F2FF]/20 pl-8 ml-0.5 overflow-visible">
+          <div className="w-full md:w-1/2 flex flex-col border-l border-[#00F2FF]/20 pl-8 ml-0.5 overflow-visible">
             <p className="text-xl md:text-2xl text-foreground/90 font-light leading-relaxed mb-10">
               Open for collaborations, challenging projects, and engineering opportunities. Let&apos;s design the next generation of intelligent systems.
             </p>
@@ -102,22 +131,18 @@ export function Contact() {
             </div>
           </div>
 
-          {/* Right Column: Video or Direct Message Form */}
-          <div className="md:w-1/2 flex flex-col justify-center overflow-visible">
-            {settings.contactVideo ? (
-              <div className="relative w-full aspect-video flex items-center justify-center overflow-hidden group">
-                <video 
-                  src={settings.contactVideo} 
-                  autoPlay 
-                  loop 
-                  muted 
-                  playsInline
-                  className="w-full h-full object-contain [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-90 group-hover:opacity-100 transition-opacity duration-700"
-                />
-              </div>
-            ) : (
-              <DirectInquiryForm email={settings.contact.email} whatsapp={settings.contact.whatsapp} />
-            )}
+          {/* Right Column: Seamlessly Blended Video (No Guidelines/Borders) */}
+          <div className="w-full md:w-1/2 flex justify-center items-center relative aspect-[16/10] overflow-hidden group">
+            <video 
+              ref={videoRef}
+              src={contactVideoSrc} 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              preload="auto"
+              className="w-full h-full object-contain [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_95%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_95%)] opacity-95 group-hover:opacity-100 transition-opacity duration-700"
+            />
           </div>
         </div>
       </div>
@@ -125,101 +150,3 @@ export function Contact() {
   );
 }
 
-function DirectInquiryForm({ email, whatsapp }: { email: string; whatsapp: string }) {
-  const [name, setName] = useState("");
-  const [senderContact, setSenderContact] = useState("");
-  const [message, setMessage] = useState("");
-
-  const handleSendEmail = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Project Inquiry from ${name || "Client"}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nContact: ${senderContact}\n\nMessage:\n${message}`
-    );
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  };
-
-  const handleSendWhatsApp = () => {
-    const text = encodeURIComponent(
-      `Hi Morgan,\n\nI'm reaching out regarding a project.\nName: ${name || "N/A"}\nEmail/Phone: ${senderContact || "N/A"}\n\nMessage:\n${message || "I'd like to discuss an engineering collaboration."}`
-    );
-    // Extract raw phone number digits from whatsapp url or fallback
-    const waClean = whatsapp.replace(/[^0-9]/g, "");
-    const waUrl = waClean ? `https://wa.me/${waClean}?text=${text}` : `https://wa.me/263773745068?text=${text}`;
-    window.open(waUrl, "_blank");
-  };
-
-  return (
-    <div className="flex flex-col border border-[#1F2937] bg-[#0B0F17]/90 p-7 lg:p-8 rounded-2xl shadow-xl relative overflow-hidden backdrop-blur-md">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="font-heading font-bold text-lg text-white">Start a Conversation</h3>
-          <p className="font-mono text-xs text-white/50 tracking-wider mt-1">Direct Engineering Dispatch</p>
-        </div>
-        <div className="w-2.5 h-2.5 rounded-full bg-[#00F2FF] animate-pulse shadow-[0_0_10px_#00F2FF]" />
-      </div>
-
-      <form onSubmit={handleSendEmail} className="flex flex-col gap-4">
-        <div>
-          <label className="block font-mono text-[10px] uppercase tracking-widest text-[#00F2FF]/70 mb-1.5">
-            Your Name / Organization
-          </label>
-          <input
-            type="text"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Alex Morgan / Tech Corp"
-            className="w-full bg-black/40 border border-[#1F2937] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00F2FF]/60 transition-all font-sans"
-          />
-        </div>
-
-        <div>
-          <label className="block font-mono text-[10px] uppercase tracking-widest text-[#00F2FF]/70 mb-1.5">
-            Email or Phone
-          </label>
-          <input
-            type="text"
-            required
-            value={senderContact}
-            onChange={(e) => setSenderContact(e.target.value)}
-            placeholder="e.g. alex@example.com or +1 234 567 890"
-            className="w-full bg-black/40 border border-[#1F2937] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00F2FF]/60 transition-all font-sans"
-          />
-        </div>
-
-        <div>
-          <label className="block font-mono text-[10px] uppercase tracking-widest text-[#00F2FF]/70 mb-1.5">
-            Project Scope / Message
-          </label>
-          <textarea
-            required
-            rows={3}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Tell me about your project, timeline, or engineering challenge..."
-            className="w-full bg-black/40 border border-[#1F2937] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00F2FF]/60 transition-all font-sans resize-none"
-          />
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 mt-2">
-          <button
-            type="submit"
-            className="flex-1 py-3 px-4 bg-[#00F2FF] hover:bg-[#00F2FF]/90 text-black font-bold font-mono text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(0,242,255,0.25)] flex items-center justify-center gap-2"
-          >
-            <Mail className="w-3.5 h-3.5" />
-            Send via Email
-          </button>
-          <button
-            type="button"
-            onClick={handleSendWhatsApp}
-            className="flex-1 py-3 px-4 border border-[#00F2FF]/30 hover:border-[#00F2FF] hover:bg-[#00F2FF]/10 text-[#00F2FF] font-bold font-mono text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2"
-          >
-            <WhatsAppIcon className="w-3.5 h-3.5" />
-            Send via WhatsApp
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}

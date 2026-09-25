@@ -110,7 +110,7 @@ const DEFAULT_SETTINGS: AdminSettings = {
   profilePicture: "",
   showProfilePicture: true,
   heroVideo: "/assets/simulation-hero.mp4",
-  contactVideo: "",
+  contactVideo: "/assets/automation.mp4",
   contact: {
     phone: "+263 773 745 068",
     whatsapp: "https://wa.me/263773745068",
