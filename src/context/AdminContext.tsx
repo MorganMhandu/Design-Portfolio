@@ -75,6 +75,25 @@ export type AdminSettings = {
 
 // ─── Default State ────────────────────────────────────────────────────────────
 
+const DEFAULT_PROJECTS: CaseProject[] = [
+  {
+    id: "proj-1",
+    title: "Autonomous Material Handling System",
+    focus: "Predictive Maintenance & Load Optimization",
+    components: "Grizzly bars, Impact Rotors, Heavy-duty Conveyors, and Structural Support Framework",
+    automation: "PLC Load Monitoring, Proximity Sensors, Variable Frequency Drives (VFD), and Automated Feeder Control.",
+    images: ["/images/autonomous-material-handling.jpg"],
+    cadSize: "142 MB",
+    dwgSize: "18 MB",
+    renderSize: "1.2 GB",
+    zipUrl: "",
+    pdfUrl: "",
+    reports: [],
+    order: 1,
+    videoUrl: ""
+  }
+];
+
 const DEFAULT_PILLARS: Pillar[] = [
   { id: "pillar-1", title: "Mechanical Design & Simulation", iconName: "Hexagon", bullets: ["Precision Assembly Modeling", "Structural Integrity & FEA", "Advanced GD&T", "High-Fidelity Visualization (Blender/Lumion)"] },
   { id: "pillar-2", title: "Automation & Control Systems", iconName: "Cpu", bullets: ["Mechatronic Integration", "PLC Logic & Smart Monitoring", "Fluid Power & Slurry Transport", "Equipment health tracking"] },
@@ -170,7 +189,7 @@ function uid() {
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [projects, setProjects] = useState<CaseProject[]>([]);
+  const [projects, setProjects] = useState<CaseProject[]>(DEFAULT_PROJECTS);
   const [pillars, setPillars] = useState<Pillar[]>(DEFAULT_PILLARS);
   const [reports, setReports] = useState<Report[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -184,7 +203,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     async function init() {
       const local = await loadFromStorage();
       if (local) {
-        if (Array.isArray(local.projects)) setProjects(local.projects);
+        if (Array.isArray(local.projects) && local.projects.length > 0) setProjects(local.projects);
         if (Array.isArray(local.pillars) && local.pillars.length > 0) setPillars(local.pillars);
         if (Array.isArray(local.reports)) setReports(local.reports);
         if (Array.isArray(local.messages)) setMessages(local.messages);
@@ -231,11 +250,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           setTimeout(() => setSyncStatus("idle"), 2000);
         } else {
           // Cloud is newer or equal — update local state from cloud
-          if (Array.isArray(cloudData.projects)) setProjects(cloudData.projects);
-          if (Array.isArray(cloudData.pillars)) setPillars(cloudData.pillars);
+          if (Array.isArray(cloudData.projects) && cloudData.projects.length > 0) setProjects(cloudData.projects);
+          if (Array.isArray(cloudData.pillars) && cloudData.pillars.length > 0) setPillars(cloudData.pillars);
           if (Array.isArray(cloudData.reports)) setReports(cloudData.reports);
           if (Array.isArray(cloudData.messages)) setMessages(cloudData.messages);
-          if (Array.isArray(cloudData.systems)) setSystems(cloudData.systems);
+          if (Array.isArray(cloudData.systems) && cloudData.systems.length > 0) setSystems(cloudData.systems);
           if (cloudData.settings) setSettings(cloudData.settings);
           await saveToStorage(cloudData);
           setSyncStatus("success");

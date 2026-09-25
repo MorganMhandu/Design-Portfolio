@@ -8,13 +8,13 @@ export function Footer() {
 
       {/* Social Icons */}
       <div className="flex items-center gap-8 text-[#94A3B8]">
-        <a href="#" className="hover:text-[#00F2FF] hover:drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] transition-all duration-300">
+        <a href="https://linkedin.com/in/morgan-mhandu" target="_blank" rel="noreferrer" aria-label="LinkedIn Profile" className="hover:text-[#00F2FF] hover:drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] transition-all duration-300">
           <Linkedin className="w-5 h-5" />
         </a>
-        <a href="#" className="hover:text-[#00F2FF] hover:drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] transition-all duration-300">
+        <a href="mailto:morganmichaelmhandu@gmail.com?subject=Engineering Inquiry" aria-label="Direct Email Inquiry" className="hover:text-[#00F2FF] hover:drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] transition-all duration-300">
           <Mail className="w-5 h-5" />
         </a>
-        <a href="#" className="hover:text-[#00F2FF] hover:drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] transition-all duration-300">
+        <a href="https://github.com/morgan-mhandu" target="_blank" rel="noreferrer" aria-label="GitHub Profile" className="hover:text-[#00F2FF] hover:drop-shadow-[0_0_8px_rgba(0,242,255,0.8)] transition-all duration-300">
           <Github className="w-5 h-5" />
         </a>
       </div>

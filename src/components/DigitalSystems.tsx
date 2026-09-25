@@ -39,15 +39,22 @@ export function DigitalSystems() {
             </p>
 
             <div className="mt-auto pt-6 border-t border-muted/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-               <a 
-                 href={sys.link.startsWith('http') ? sys.link : `https://${sys.link}`} 
-                 target="_blank"
-                 rel="noreferrer"
-                 className="flex items-center gap-2 text-xs font-mono tracking-widest text-white hover:text-[#00F2FF] uppercase transition-colors"
-               >
-                 <LayoutTemplate className="w-4 h-4" />
-                 Launch Application
-               </a>
+               {sys.link && sys.link !== "#" ? (
+                 <a 
+                   href={sys.link.startsWith('http') ? sys.link : `https://${sys.link}`} 
+                   target="_blank"
+                   rel="noreferrer"
+                   className="flex items-center gap-2 text-xs font-mono tracking-widest text-white hover:text-[#00F2FF] uppercase transition-colors"
+                 >
+                   <LayoutTemplate className="w-4 h-4" />
+                   Launch Application
+                 </a>
+               ) : (
+                 <span className="flex items-center gap-2 text-xs font-mono tracking-widest text-white/40 uppercase cursor-default">
+                   <LayoutTemplate className="w-4 h-4" />
+                   Internal System
+                 </span>
+               )}
                {sys.videoUrl && (
                  <a 
                    href={sys.videoUrl} 
