@@ -19,14 +19,11 @@ export function DigitalSystems() {
           <div key={sys.id} className="flex flex-col justify-between border border-[#1F2937] bg-[#0B0F17]/90 p-7 rounded-2xl hover:border-[#00F2FF]/60 hover:shadow-cad-glow transition-all duration-300 group relative overflow-hidden min-h-[200px]">
             
             <div>
-              {/* Top Row: Icon + Version Tag */}
+              {/* Top Row: Icon */}
               <div className="flex items-center justify-between mb-5">
                 <div className="w-10 h-10 rounded-xl bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] group-hover:scale-110 group-hover:bg-[#00F2FF] group-hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,242,255,0.15)]">
                   <Code className="w-5 h-5" strokeWidth={1.5} />
                 </div>
-                <span className="font-mono text-[10px] text-[#00F2FF]/60 uppercase tracking-widest">
-                  SYS // 0{idx + 1}
-                </span>
               </div>
               
               {/* Title */}

@@ -21,6 +21,7 @@ const bootSequence = [
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [agent, setAgent] = useState("");
   const [accessCode, setAccessCode] = useState("");
   const [showCode, setShowCode] = useState(false);
   const [status, setStatus] = useState<"idle" | "scanning" | "success" | "denied">("idle");
@@ -73,7 +74,7 @@ export default function AdminLoginPage() {
           setStatus("success");
           const expiry = Date.now() + SESSION_DURATION_MS;
           sessionStorage.setItem("admin_session_expiry", expiry.toString());
-          sessionStorage.setItem("admin_operator", "MORGAN");
+          sessionStorage.setItem("admin_operator", agent.trim() || "MORGAN");
           setTimeout(() => router.push("/admin/dashboard"), 1200);
         } else {
           setStatus("denied");
@@ -157,17 +158,34 @@ export default function AdminLoginPage() {
                 Identity Verification
               </h1>
               <p className="font-mono text-[10px] text-[#94A3B8]/60 tracking-widest uppercase mt-0.5">
-                Admin Access
+                Admin Console
               </p>
             </div>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {/* Access Code */}
+            {/* Agent Input */}
             <div className="flex flex-col gap-2">
               <label className="font-mono text-[9px] tracking-[0.3em] text-[#00F2FF]/70 uppercase">
-                Access Key
+                Agent
+              </label>
+              <input
+                type="text"
+                id="agent"
+                value={agent}
+                onChange={(e) => setAgent(e.target.value)}
+                disabled={status === "scanning" || status === "success"}
+                className="w-full bg-black/40 border border-[#00F2FF]/25 rounded-lg px-4 py-3 font-mono text-sm text-white tracking-wider focus:outline-none focus:border-[#00F2FF]/80 focus:shadow-[0_0_15px_rgba(0,242,255,0.15)] transition-all placeholder:text-white/20"
+                placeholder="[ ENTER AGENT NAME ]"
+                autoComplete="off"
+              />
+            </div>
+
+            {/* Access Code Input */}
+            <div className="flex flex-col gap-2">
+              <label className="font-mono text-[9px] tracking-[0.3em] text-[#00F2FF]/70 uppercase">
+                Access Code
               </label>
               <div className="relative">
                 <input
@@ -177,7 +195,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setAccessCode(e.target.value)}
                   disabled={status === "scanning" || status === "success"}
                   className="w-full bg-black/40 border border-[#00F2FF]/25 rounded-lg px-4 py-3 pr-12 font-mono text-sm text-white tracking-widest focus:outline-none focus:border-[#00F2FF]/80 focus:shadow-[0_0_15px_rgba(0,242,255,0.15)] transition-all placeholder:text-white/15"
-                  placeholder="[ ENTER ACCESS KEY ]"
+                  placeholder="[ ENTER ACCESS CODE ]"
                   autoComplete="off"
                 />
                 <button

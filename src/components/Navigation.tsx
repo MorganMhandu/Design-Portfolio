@@ -35,14 +35,18 @@ export function Navigation() {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Token */}
-        <a href="#" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-lg bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] font-mono text-xs font-bold group-hover:bg-[#00F2FF] group-hover:text-black transition-all">
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/admin" 
+            title="Admin Console"
+            className="w-8 h-8 rounded-lg bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] font-mono text-xs font-bold hover:bg-[#00F2FF] hover:text-black transition-all cursor-pointer shadow-[0_0_15px_rgba(0,242,255,0.15)]"
+          >
             MM
-          </div>
-          <span className="font-heading font-bold text-sm text-white tracking-wider">
+          </Link>
+          <a href="#" className="font-heading font-bold text-sm text-white tracking-wider hover:text-[#00F2FF] transition-colors">
             MORGAN MHANDU
-          </span>
-        </a>
+          </a>
+        </div>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-wider">

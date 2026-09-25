@@ -5,7 +5,6 @@ import { Expertise } from "@/components/Expertise";
 import { Contact } from "@/components/Contact";
 import { DigitalSystems } from "@/components/DigitalSystems";
 import { Footer } from "@/components/Footer";
-import { AdminShortcut } from "@/components/AdminShortcut";
 
 export default function Home() {
   return (
@@ -17,7 +16,6 @@ export default function Home() {
       <DigitalSystems />
       <Contact />
       <Footer />
-      <AdminShortcut />
     </main>
   );
 }

@@ -102,36 +102,124 @@ export function Contact() {
             </div>
           </div>
 
-          {/* Right Column: Video or Placeholder */}
+          {/* Right Column: Video or Direct Message Form */}
           <div className="md:w-1/2 flex flex-col justify-center overflow-visible">
             {settings.contactVideo ? (
-              <div className="w-full aspect-video rounded-2xl border border-[#00F2FF]/20 bg-[#000814]/50 overflow-hidden shadow-[0_0_30px_rgba(0,242,255,0.1)] group">
+              <div className="relative w-full aspect-video flex items-center justify-center overflow-hidden group">
                 <video 
                   src={settings.contactVideo} 
                   autoPlay 
                   loop 
                   muted 
                   playsInline
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                  className="w-full h-full object-contain [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-90 group-hover:opacity-100 transition-opacity duration-700"
                 />
               </div>
             ) : (
-              <div className="w-full aspect-video rounded-2xl border border-[#00F2FF]/20 bg-[#000814]/50 flex flex-col items-center justify-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                <div className="w-16 h-16 rounded-full border border-[#00F2FF]/30 bg-[#00F2FF]/5 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,242,255,0.1)] group-hover:scale-110 transition-transform duration-500">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6 text-[#00F2FF]/70 ml-1">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="font-mono text-xs text-[#00F2FF]/40 tracking-widest uppercase relative z-10">
-                  Video Reel Placeholder
-                </p>
-              </div>
+              <DirectInquiryForm email={settings.contact.email} whatsapp={settings.contact.whatsapp} />
             )}
           </div>
         </div>
       </div>
     </Section>
+  );
+}
+
+function DirectInquiryForm({ email, whatsapp }: { email: string; whatsapp: string }) {
+  const [name, setName] = useState("");
+  const [senderContact, setSenderContact] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSendEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Project Inquiry from ${name || "Client"}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nContact: ${senderContact}\n\nMessage:\n${message}`
+    );
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  };
+
+  const handleSendWhatsApp = () => {
+    const text = encodeURIComponent(
+      `Hi Morgan,\n\nI'm reaching out regarding a project.\nName: ${name || "N/A"}\nEmail/Phone: ${senderContact || "N/A"}\n\nMessage:\n${message || "I'd like to discuss an engineering collaboration."}`
+    );
+    // Extract raw phone number digits from whatsapp url or fallback
+    const waClean = whatsapp.replace(/[^0-9]/g, "");
+    const waUrl = waClean ? `https://wa.me/${waClean}?text=${text}` : `https://wa.me/263773745068?text=${text}`;
+    window.open(waUrl, "_blank");
+  };
+
+  return (
+    <div className="flex flex-col border border-[#1F2937] bg-[#0B0F17]/90 p-7 lg:p-8 rounded-2xl shadow-xl relative overflow-hidden backdrop-blur-md">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="font-heading font-bold text-lg text-white">Start a Conversation</h3>
+          <p className="font-mono text-xs text-white/50 tracking-wider mt-1">Direct Engineering Dispatch</p>
+        </div>
+        <div className="w-2.5 h-2.5 rounded-full bg-[#00F2FF] animate-pulse shadow-[0_0_10px_#00F2FF]" />
+      </div>
+
+      <form onSubmit={handleSendEmail} className="flex flex-col gap-4">
+        <div>
+          <label className="block font-mono text-[10px] uppercase tracking-widest text-[#00F2FF]/70 mb-1.5">
+            Your Name / Organization
+          </label>
+          <input
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Alex Morgan / Tech Corp"
+            className="w-full bg-black/40 border border-[#1F2937] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00F2FF]/60 transition-all font-sans"
+          />
+        </div>
+
+        <div>
+          <label className="block font-mono text-[10px] uppercase tracking-widest text-[#00F2FF]/70 mb-1.5">
+            Email or Phone
+          </label>
+          <input
+            type="text"
+            required
+            value={senderContact}
+            onChange={(e) => setSenderContact(e.target.value)}
+            placeholder="e.g. alex@example.com or +1 234 567 890"
+            className="w-full bg-black/40 border border-[#1F2937] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00F2FF]/60 transition-all font-sans"
+          />
+        </div>
+
+        <div>
+          <label className="block font-mono text-[10px] uppercase tracking-widest text-[#00F2FF]/70 mb-1.5">
+            Project Scope / Message
+          </label>
+          <textarea
+            required
+            rows={3}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Tell me about your project, timeline, or engineering challenge..."
+            className="w-full bg-black/40 border border-[#1F2937] rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#00F2FF]/60 transition-all font-sans resize-none"
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          <button
+            type="submit"
+            className="flex-1 py-3 px-4 bg-[#00F2FF] hover:bg-[#00F2FF]/90 text-black font-bold font-mono text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(0,242,255,0.25)] flex items-center justify-center gap-2"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            Send via Email
+          </button>
+          <button
+            type="button"
+            onClick={handleSendWhatsApp}
+            className="flex-1 py-3 px-4 border border-[#00F2FF]/30 hover:border-[#00F2FF] hover:bg-[#00F2FF]/10 text-[#00F2FF] font-bold font-mono text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2"
+          >
+            <WhatsAppIcon className="w-3.5 h-3.5" />
+            Send via WhatsApp
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -38,14 +38,11 @@ export function Expertise() {
             key={cap.id} 
             className="flex flex-col justify-between relative group rounded-2xl border border-[#1F2937] bg-[#0B0F17]/90 backdrop-blur-md p-6 lg:p-8 min-h-[170px] hover:border-[#00F2FF]/60 hover:shadow-cad-glow transition-all duration-300 cursor-default overflow-hidden"
           >
-            {/* Top Row: Icon + Number Index */}
+            {/* Top Row: Icon */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#00F2FF]/10 border border-[#00F2FF]/30 text-[#00F2FF] group-hover:scale-110 group-hover:bg-[#00F2FF] group-hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,242,255,0.15)]">
                 {getIcon(cap.iconName)}
               </div>
-              <span className="font-mono text-xs font-bold text-[#00F2FF]/60 tracking-widest">
-                0{idx + 1}
-              </span>
             </div>
 
             {/* Prominent Heading */}
