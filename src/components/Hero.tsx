@@ -100,91 +100,75 @@ export function Hero() {
   }, [settings.profilePicture]);
 
   return (
-    <section className="relative h-[100vh] w-full overflow-hidden flex items-center justify-center py-[6vh] px-[10%] bg-[#020617]">
+    <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-28 pb-16 px-[8%] lg:px-[10%] bg-[#020617]">
       
       {/* --- ATMOSPHERIC LIGHTING (DARK MODE PLUS) --- */}
       <div className="absolute top-0 right-0 w-[70vw] h-[70vw] bg-[radial-gradient(circle_at_center,_rgba(41,121,255,0.15)_0%,_transparent_60%)] -z-10 translate-x-1/4 -translate-y-1/4" />
       <div className="absolute bottom-0 left-0 w-[50vw] h-[50vw] bg-[radial-gradient(circle_at_center,_rgba(41,121,255,0.10)_0%,_transparent_60%)] -z-10 -translate-x-1/4 translate-y-1/4" />
 
       {/* Container: Splits layout into 60/40 */}
-      <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-[1400px] z-10 gap-8 lg:gap-4">
+      <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-[1400px] z-10 gap-12 lg:gap-8">
         
-        {/* Left Column (60% width) */}
-        <div className="w-full lg:w-[60%] flex flex-col items-start justify-center pt-8 lg:pt-0">
+        {/* Left Column (58% width) */}
+        <div className="w-full lg:w-[58%] flex flex-col items-start justify-center">
           
-          {/* Biometric ID / Headshot Section */}
+          {/* Integrated Biometric ID + Status + Name Row */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex items-end gap-6 mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="flex items-center gap-5 mb-5"
           >
             {settings.showProfilePicture && (
-              <div className="relative group">
+              <div className="relative group shrink-0">
                 {/* Border with Metallic Titanium Gradient & Cyan Glow */}
-                <div className="relative w-28 h-28 p-[2px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#BFC9D2] via-[#94A3B8] to-[#DCE3EA] shadow-[0_0_20px_rgba(0,242,255,0.25)] group-hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all duration-500">
+                <div className="relative w-20 h-20 p-[2px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#BFC9D2] via-[#94A3B8] to-[#DCE3EA] shadow-[0_0_20px_rgba(0,242,255,0.25)] group-hover:shadow-[0_0_30px_rgba(0,242,255,0.5)] transition-all duration-500">
                   <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-[#020617]">
                     {/* Headshot Image */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={settings.profilePicture || "/images/headshot.jpg"} 
-                      alt="Morgan Mhandu, Mechanical & Automation Engineer Profile" 
-                      className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                      alt="Morgan Mhandu Profile" 
+                      className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-700"
                       key={refreshKey}
                     />
-                    
-                    {/* Technical Overlay: Scan Grid */}
-                    <div className="absolute inset-0 pointer-events-none opacity-30 mix-blend-overlay bg-[linear-gradient(rgba(0,242,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,242,255,0.05)_1px,transparent_1px)] bg-[size:4px_4px]" />
-                    <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(transparent_0%,rgba(0,242,255,0.1)_50%,transparent_100%)] bg-[size:100%_20px] animate-[scan_3s_linear_infinite]" />
+                    <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(0,242,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,242,255,0.05)_1px,transparent_1px)] bg-[size:4px_4px]" />
                   </div>
                 </div>
                 
-                {/* Frame corner accents */}
-                <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-[#00F2FF] shadow-[0_0_8px_#00F2FF]" />
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-[#00F2FF] shadow-[0_0_8px_#00F2FF]" />
+                {/* Corner reticle marks */}
+                <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#00F2FF]" />
+                <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#00F2FF]" />
               </div>
             )}
 
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse" />
+                <span className="font-mono text-[10px] text-[#00F2FF] tracking-[0.25em] uppercase font-semibold">
+                  STATUS: ONLINE // HARARE, ZW
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-heading font-bold text-white tracking-tight">
+                Morgan Michael Mhandu
+              </h2>
+              <span className="font-mono text-xs text-[#94A3B8] tracking-widest uppercase">
+                PORTFOLIO // SPECIFICATION INDEX
+              </span>
+            </div>
           </motion.div>
-
-          {/* Line 1: Status Flag & Name */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-2 mb-2"
-          >
-            <span className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse" />
-            <span className="font-mono text-[10px] text-[#00F2FF] tracking-[0.25em] uppercase font-semibold">
-              SYSTEM ONLINE // HARARE, ZW
-            </span>
-          </motion.div>
-
-          <motion.h2 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-lg sm:text-xl font-heading font-medium tracking-wide mb-1 text-[#E0F7FA]"
-            style={{ textShadow: "0 0 8px rgba(0, 242, 255, 0.4)" }}
-          >
-            Morgan Michael Mhandu
-          </motion.h2>
 
           {/* Line 2 & 3: Main Title with Engineered Precision Heading */}
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-heading font-bold leading-[1.05] tracking-tight mb-4 drop-shadow-[0_0_15px_rgba(0,242,255,0.3)] text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem]"
-            style={{ 
-              backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 45%, #94A3B8 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              filter: "drop-shadow(0 0 1px rgba(255,255,255,0.5))"
-            }}
+            className="font-heading font-bold leading-[1.08] tracking-tight mb-5 text-[2.4rem] sm:text-[3.2rem] lg:text-[3.8rem] text-white"
           >
             Mechanical Systems &amp; <br className="hidden sm:block" />
-            Automation Engineer
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00F2FF] via-white to-[#94A3B8] drop-shadow-[0_0_20px_rgba(0,242,255,0.35)]">
+              Automation Engineer
+            </span>
           </motion.h1>
 
           {/* Line 4: Discipline Badges */}
@@ -192,15 +176,15 @@ export function Hero() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-wrap gap-2 mb-6"
+            className="flex flex-wrap gap-2.5 mb-6"
           >
-            <span className="font-mono text-[#00F2FF] font-semibold tracking-widest uppercase bg-[#00F2FF]/5 border border-[#00F2FF]/30 px-3 py-1.5 shadow-[0_0_15px_rgba(0,242,255,0.1)] text-[10px] sm:text-xs rounded-lg">
+            <span className="font-mono text-[#00F2FF] font-semibold tracking-wider uppercase bg-[#00F2FF]/10 border border-[#00F2FF]/40 px-3 py-1 text-[10px] sm:text-xs rounded-md shadow-[0_0_10px_rgba(0,242,255,0.15)]">
               HEAVY INDUSTRIAL CAD
             </span>
-            <span className="font-mono text-white/80 font-semibold tracking-widest uppercase bg-white/5 border border-white/15 px-3 py-1.5 text-[10px] sm:text-xs rounded-lg">
+            <span className="font-mono text-white/90 font-semibold tracking-wider uppercase bg-white/5 border border-white/20 px-3 py-1 text-[10px] sm:text-xs rounded-md">
               FEA SIMULATION
             </span>
-            <span className="font-mono text-[#FF5400] font-semibold tracking-widest uppercase bg-[#FF5400]/5 border border-[#FF5400]/30 px-3 py-1.5 text-[10px] sm:text-xs rounded-lg">
+            <span className="font-mono text-[#FF5400] font-semibold tracking-wider uppercase bg-[#FF5400]/10 border border-[#FF5400]/40 px-3 py-1 text-[10px] sm:text-xs rounded-md">
               FULL-STACK AUTOMATION
             </span>
           </motion.div>
@@ -210,9 +194,9 @@ export function Hero() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-base text-[#B0F2F7] leading-relaxed max-w-[540px] mb-8 font-light"
+            className="text-base sm:text-lg text-[#94A3B8] leading-relaxed max-w-[540px] mb-8 font-light"
           >
-            Designing intelligent physical systems and full-stack digital architectures by synthesizing <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">industrial engineering</span>, <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">high-tolerance CAD</span>, and <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">modern web software</span>.
+            Designing intelligent physical systems and full-stack digital architectures by synthesizing <span className="text-[#00F2FF] font-medium">industrial engineering</span>, <span className="text-[#00F2FF] font-medium">high-tolerance CAD</span>, and <span className="text-[#00F2FF] font-medium">modern web software</span>.
           </motion.p>
 
           {/* Action CTAs */}
@@ -222,22 +206,22 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-wrap gap-4 mt-2 font-mono text-xs"
           >
-            <a href="#projects" className="px-8 py-3.5 bg-gradient-to-r from-white to-[#00F2FF]/90 text-black font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:from-[#00F2FF] hover:to-[#00F2FF] shadow-[0_0_20px_rgba(0,242,255,0.4)] hover:shadow-[0_0_35px_rgba(0,242,255,0.8)] uppercase tracking-wider">
+            <a href="#projects" className="px-8 py-3.5 bg-gradient-to-r from-white to-[#00F2FF] text-black font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-cad-glow uppercase tracking-wider">
               Explore Case Studies
             </a>
-            <a href="#capabilities" className="px-6 py-3.5 border border-[#00F2FF]/30 bg-black/40 text-white rounded-xl hover:border-[#00F2FF] hover:bg-[#00F2FF]/10 transition-all uppercase tracking-wider">
+            <a href="#capabilities" className="px-6 py-3.5 border border-[#1F2937] bg-[#0B0F17]/80 text-[#94A3B8] hover:text-white rounded-xl hover:border-[#00F2FF]/50 hover:bg-[#00F2FF]/5 transition-all uppercase tracking-wider">
               Technical Matrix
             </a>
           </motion.div>
 
         </div>
 
-        {/* Right Column (40% width) - Graphic isolated entirely to this column */}
+        {/* Right Column (42% width) - Interactive Video Screen */}
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.4 }}
-          className="w-full lg:w-[48%] flex justify-center items-center relative aspect-video bg-black/40 border border-[#00F2FF]/40 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(0,242,255,0.15),inset_0_0_30px_rgba(0,242,255,0.05)] backdrop-blur-md group"
+          transition={{ duration: 0.9, delay: 0.3 }}
+          className="w-full lg:w-[42%] flex justify-center items-center relative aspect-[16/10] bg-black/60 border border-[#00F2FF]/30 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(0,242,255,0.12)] backdrop-blur-md group"
         >
           {settings.heroVideo ? (
             <div className="relative w-full h-full">
