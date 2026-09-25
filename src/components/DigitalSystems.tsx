@@ -10,48 +10,53 @@ export function DigitalSystems() {
   const sortedSystems = [...systems].sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
-    <Section id="digital-systems">
+    <Section id="digital-systems" className="pt-12 md:pt-20">
       <SectionHeading>Digital Systems</SectionHeading>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         
-        {sortedSystems.map((sys) => (
-          <div key={sys.id} className="flex flex-col border border-[#00F2FF]/20 bg-background/50 p-8 rounded-max hover:border-[#00F2FF]/50 transition-all duration-300 group shadow-[rgba(0,242,255,0.05)_0px_0px_20px] relative overflow-hidden">
+        {sortedSystems.map((sys, idx) => (
+          <div key={sys.id} className="flex flex-col justify-between border border-[#1F2937] bg-[#0B0F17]/90 p-7 rounded-2xl hover:border-[#00F2FF]/60 hover:shadow-cad-glow transition-all duration-300 group relative overflow-hidden min-h-[200px]">
             
-            <Code className="w-10 h-10 text-[#00F2FF] mb-6 group-hover:scale-110 transition-transform" strokeWidth={1.5} />
-            
-            <h3 className="text-xl md:text-2xl font-bold mb-3 tracking-wide drop-shadow-sm" style={{
-              backgroundImage: "linear-gradient(180deg, #FFFFFF 10%, #BFC9D2 40%, #DCE3EA 70%, #94A3B8 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }}>
-              {sys.title}
-            </h3>
-            
-            <div className="flex flex-wrap gap-3 mb-6">
-               {sys.techStack.map(tech => (
-                 <span key={tech} className="px-3 py-1 text-[10px] font-mono uppercase tracking-widest border border-[#00F2FF]/30 text-[#00F2FF]/90">{tech}</span>
-               ))}
+            <div>
+              {/* Top Row: Icon + Version Tag */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="w-10 h-10 rounded-xl bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] group-hover:scale-110 group-hover:bg-[#00F2FF] group-hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,242,255,0.15)]">
+                  <Code className="w-5 h-5" strokeWidth={1.5} />
+                </div>
+                <span className="font-mono text-[10px] text-[#00F2FF]/60 uppercase tracking-widest">
+                  SYS // 0{idx + 1}
+                </span>
+              </div>
+              
+              {/* Title */}
+              <h3 className="font-heading text-xl font-bold mb-4 tracking-tight text-white group-hover:text-[#00F2FF] transition-colors">
+                {sys.title}
+              </h3>
+              
+              {/* Tech Stack Pills */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {sys.techStack.map(tech => (
+                  <span key={tech} className="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider rounded-md bg-[#030712] border border-[#1F2937] text-[#94A3B8] group-hover:border-[#00F2FF]/30 group-hover:text-[#00F2FF] transition-colors">{tech}</span>
+                ))}
+              </div>
             </div>
 
-            <p className="text-foreground/80 font-light text-sm leading-relaxed mb-6">
-              {sys.description}
-            </p>
-
-            <div className="mt-auto pt-6 border-t border-muted/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Launch Action */}
+            <div className="pt-4 border-t border-[#1F2937] flex items-center justify-between gap-4">
                {sys.link && sys.link !== "#" ? (
                  <a 
                    href={sys.link.startsWith('http') ? sys.link : `https://${sys.link}`} 
                    target="_blank"
                    rel="noreferrer"
-                   className="flex items-center gap-2 text-xs font-mono tracking-widest text-white hover:text-[#00F2FF] uppercase transition-colors"
+                   className="flex items-center gap-2 text-xs font-mono tracking-wider text-white hover:text-[#00F2FF] uppercase transition-colors font-semibold"
                  >
-                   <LayoutTemplate className="w-4 h-4" />
-                   Launch Application
+                   <LayoutTemplate className="w-3.5 h-3.5 text-[#00F2FF]" />
+                   Launch System
                  </a>
                ) : (
-                 <span className="flex items-center gap-2 text-xs font-mono tracking-widest text-white/40 uppercase cursor-default">
-                   <LayoutTemplate className="w-4 h-4" />
+                 <span className="flex items-center gap-2 text-xs font-mono tracking-wider text-[#94A3B8]/60 uppercase cursor-default">
+                   <LayoutTemplate className="w-3.5 h-3.5 text-[#00F2FF]/40" />
                    Internal System
                  </span>
                )}
@@ -60,13 +65,16 @@ export function DigitalSystems() {
                    href={sys.videoUrl} 
                    target="_blank"
                    rel="noreferrer"
-                   className="flex items-center gap-2 text-xs font-mono tracking-widest text-[#00F2FF] hover:text-white uppercase transition-colors"
+                   className="flex items-center gap-2 text-xs font-mono tracking-wider text-[#FF5400] hover:text-white uppercase transition-colors"
                  >
-                   <PlayCircle className="w-4 h-4" />
-                   Watch Demo
+                   <PlayCircle className="w-3.5 h-3.5" />
+                   Demo
                  </a>
                )}
             </div>
+
+            {/* Bottom Glow Line */}
+            <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#00F2FF] to-transparent group-hover:w-full transition-all duration-500 ease-out" />
           </div>
         ))}
 
