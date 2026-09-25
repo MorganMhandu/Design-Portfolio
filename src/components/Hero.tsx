@@ -147,25 +147,37 @@ export function Hero() {
 
           </motion.div>
 
-          {/* Line 1: Name */}
+          {/* Line 1: Status Flag & Name */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex items-center gap-2 mb-2"
+          >
+            <span className="w-2 h-2 rounded-full bg-[#00F2FF] animate-pulse" />
+            <span className="font-mono text-[10px] text-[#00F2FF] tracking-[0.25em] uppercase font-semibold">
+              SYSTEM ONLINE // HARARE, ZW
+            </span>
+          </motion.div>
+
           <motion.h2 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-[1.3rem] font-light tracking-wide mb-1 text-[#E0F7FA]"
+            className="text-lg sm:text-xl font-heading font-medium tracking-wide mb-1 text-[#E0F7FA]"
             style={{ textShadow: "0 0 8px rgba(0, 242, 255, 0.4)" }}
           >
             Morgan Michael Mhandu
           </motion.h2>
 
-          {/* Line 2 & 3: Main Title */}
+          {/* Line 2 & 3: Main Title with Engineered Precision Heading */}
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="font-bold leading-[1.05] tracking-tighter mb-4 drop-shadow-[0_0_15px_rgba(0,242,255,0.3)] text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem]"
+            className="font-heading font-bold leading-[1.05] tracking-tight mb-4 drop-shadow-[0_0_15px_rgba(0,242,255,0.3)] text-[2.5rem] sm:text-[3.5rem] lg:text-[4rem]"
             style={{ 
-              backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 45%, #B0BEC5 100%)",
+              backgroundImage: "linear-gradient(to bottom right, #FFFFFF 0%, #00F2FF 45%, #94A3B8 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               filter: "drop-shadow(0 0 1px rgba(255,255,255,0.5))"
@@ -175,37 +187,46 @@ export function Hero() {
             Automation Engineer
           </motion.h1>
 
-          {/* Line 4: Role Tag with Neon HUD Glow */}
+          {/* Line 4: Discipline Badges */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-6"
+            className="flex flex-wrap gap-2 mb-6"
           >
-            <span className="font-mono text-[#00F2FF] font-semibold tracking-widest uppercase bg-[#00F2FF]/5 border border-[#00F2FF]/30 px-4 py-2 shadow-[0_0_15px_rgba(0,242,255,0.1)] inline-block text-[10px] sm:text-xs rounded-lg">
-              MECHANICAL DESIGN ENGINEER
+            <span className="font-mono text-[#00F2FF] font-semibold tracking-widest uppercase bg-[#00F2FF]/5 border border-[#00F2FF]/30 px-3 py-1.5 shadow-[0_0_15px_rgba(0,242,255,0.1)] text-[10px] sm:text-xs rounded-lg">
+              HEAVY INDUSTRIAL CAD
+            </span>
+            <span className="font-mono text-white/80 font-semibold tracking-widest uppercase bg-white/5 border border-white/15 px-3 py-1.5 text-[10px] sm:text-xs rounded-lg">
+              FEA SIMULATION
+            </span>
+            <span className="font-mono text-[#FF5400] font-semibold tracking-widest uppercase bg-[#FF5400]/5 border border-[#FF5400]/30 px-3 py-1.5 text-[10px] sm:text-xs rounded-lg">
+              FULL-STACK AUTOMATION
             </span>
           </motion.div>
 
-          {/* Line 4: Description */}
+          {/* Line 5: Description */}
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-base text-[#B0F2F7] leading-relaxed max-w-[500px] mb-8"
+            className="text-base text-[#B0F2F7] leading-relaxed max-w-[540px] mb-8 font-light"
           >
-            Designing intelligent mechanical systems by integrating <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">industrial engineering</span>, <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">automation</span>, and <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">digital technologies</span>.
+            Designing intelligent physical systems and full-stack digital architectures by synthesizing <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">industrial engineering</span>, <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">high-tolerance CAD</span>, and <span className="text-[#00F2FF] font-bold drop-shadow-[0_0_5px_rgba(0,242,255,0.6)]">modern web software</span>.
           </motion.p>
 
-          {/* Refined "Explore Work" Glow Button */}
+          {/* Action CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex gap-4 mt-2"
+            className="flex flex-wrap gap-4 mt-2 font-mono text-xs"
           >
-            <a href="#projects" className="px-8 py-4 bg-gradient-to-r from-white to-[#00F2FF]/90 text-black font-bold rounded-full transition-all duration-300 hover:scale-105 hover:from-[#00F2FF] hover:to-[#00F2FF] shadow-[0_0_15px_rgba(0,242,255,0.4)] hover:shadow-[0_0_40px_rgba(0,242,255,0.9)] hover:text-white text-sm">
-              Explore Work
+            <a href="#projects" className="px-8 py-3.5 bg-gradient-to-r from-white to-[#00F2FF]/90 text-black font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:from-[#00F2FF] hover:to-[#00F2FF] shadow-[0_0_20px_rgba(0,242,255,0.4)] hover:shadow-[0_0_35px_rgba(0,242,255,0.8)] uppercase tracking-wider">
+              Explore Case Studies
+            </a>
+            <a href="#capabilities" className="px-6 py-3.5 border border-[#00F2FF]/30 bg-black/40 text-white rounded-xl hover:border-[#00F2FF] hover:bg-[#00F2FF]/10 transition-all uppercase tracking-wider">
+              Technical Matrix
             </a>
           </motion.div>
 

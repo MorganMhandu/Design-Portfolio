@@ -9,14 +9,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#0a0a0a",
+        background: "#030712",
         foreground: "#f5f5f5",
-        muted: "#262626",
+        muted: "#1F2937",
         accent: "#d4d4d4",
+        carbon: {
+          950: "#030712",
+          900: "#0B0F17",
+          850: "#111827",
+          800: "#1F2937",
+          700: "#374151",
+        },
+        precision: {
+          cyan: "#00F2FF",
+          cyanHover: "#33F6FF",
+          orange: "#FF5400",
+          steel: "#94A3B8",
+          platinum: "#F8FAFC",
+        },
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
+        sans: ["var(--font-inter)", "sans-serif"],
+        heading: ["var(--font-space-grotesk)", "sans-serif"],
         mono: ["var(--font-jetbrains)", "monospace"],
+      },
+      boxShadow: {
+        "cad-glow": "0 0 25px -5px rgba(0, 242, 255, 0.25)",
+        "orange-glow": "0 0 25px -5px rgba(255, 84, 0, 0.3)",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",

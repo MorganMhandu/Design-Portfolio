@@ -293,34 +293,46 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: number; onOpen: () => void }) {
   return (
     <div 
-      className="relative flex flex-col border border-[#00F2FF]/10 bg-[#020617]/80 backdrop-blur-md rounded-2xl hover:border-[#00F2FF]/50 hover:shadow-[0_0_20px_rgba(0,242,255,0.15)] transition-all duration-300 group overflow-hidden cursor-pointer h-full"
+      className="relative flex flex-col border border-[#1F2937] bg-[#0B0F17]/90 backdrop-blur-md rounded-2xl hover:border-[#00F2FF]/60 hover:shadow-cad-glow transition-all duration-300 group overflow-hidden cursor-pointer h-full"
       onClick={onOpen}
     >
-      <div className="relative w-full aspect-square bg-[#000814] overflow-hidden border-b border-[#00F2FF]/10">
+      {/* Visual Canvas */}
+      <div className="relative w-full aspect-square bg-[#030712] overflow-hidden border-b border-[#1F2937]">
         {project.images && project.images.length > 0 ? (
           <Image 
             src={project.images[0]} 
             alt={project.title} 
             fill
-            className="object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
+            className="object-cover opacity-85 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-[#020617]/50">
-             <span className="font-mono text-[10px] text-[#00F2FF]/30 tracking-widest uppercase">No Image</span>
+             <span className="font-mono text-[10px] text-[#00F2FF]/40 tracking-widest uppercase">No Render</span>
           </div>
         )}
-        </div>
 
-      <div className="p-5 flex flex-col flex-grow justify-between bg-gradient-to-t from-black/60 to-transparent">
-        <h3 className="text-sm font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300 line-clamp-2 mb-4">
-          {project.title}
-        </h3>
+        {/* Index Tag */}
+        <div className="absolute top-3 left-3 px-2.5 py-1 rounded bg-[#030712]/90 border border-[#1F2937] font-mono text-[9px] text-[#00F2FF] font-bold">
+          CAD // 0{idx + 1}
+        </div>
+      </div>
+
+      {/* Info Payload */}
+      <div className="p-5 flex flex-col flex-grow justify-between bg-gradient-to-t from-black/80 to-transparent">
+        <div>
+          <span className="font-mono text-[9px] text-[#94A3B8] tracking-widest uppercase block mb-1.5 truncate">
+            {project.focus || "ENGINEERING CASE STUDY"}
+          </span>
+          <h3 className="font-heading text-base font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300 line-clamp-2 mb-4">
+            {project.title}
+          </h3>
+        </div>
         
-        <button className="flex items-center justify-between w-full text-left font-mono text-[10px] tracking-widest text-[#00F2FF]/70 group-hover:text-[#00F2FF] uppercase transition-colors">
-          <span>View Project</span>
-          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-        </button>
+        <div className="pt-3 border-t border-[#1F2937] flex items-center justify-between w-full font-mono text-[10px] tracking-wider text-[#00F2FF]/80 group-hover:text-[#00F2FF] uppercase transition-colors">
+          <span>Inspect Model & Specs</span>
+          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform" />
+        </div>
       </div>
     </div>
   );

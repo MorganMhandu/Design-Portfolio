@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { AdminProvider } from "@/context/AdminContext";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
 
 export const metadata: Metadata = {
@@ -59,7 +60,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth bg-background">
-      <body className={`${inter.variable} ${jetbrains.variable} font-sans antialiased text-foreground overflow-x-hidden min-h-screen selection:bg-muted selection:text-heading`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrains.variable} font-sans antialiased text-foreground overflow-x-hidden min-h-screen selection:bg-[#00F2FF]/20 selection:text-[#00F2FF]`}>
         <AdminProvider>
           {children}
         </AdminProvider>
