@@ -20,7 +20,7 @@ export function Section({ children, className, id }: SectionProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      className={cn("relative py-20 md:py-32 w-full max-w-[1400px] mx-auto px-[10%]", className)}
+      className={cn("relative py-20 md:py-32 w-full max-w-[1400px] mx-auto px-[8%] lg:px-[10%] scroll-mt-28 md:scroll-mt-36", className)}
     >
       {children}
     </motion.section>

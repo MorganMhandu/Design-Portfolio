@@ -291,6 +291,9 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 }
 
 function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: number; onOpen: () => void }) {
+  const [imgError, setImgError] = useState(false);
+  const hasImage = project.images && project.images.length > 0 && !imgError;
+
   return (
     <div 
       className="relative flex flex-col border border-[#1F2937] bg-[#0B0F17]/90 backdrop-blur-md rounded-2xl hover:border-[#00F2FF]/60 hover:shadow-cad-glow transition-all duration-300 group overflow-hidden cursor-pointer h-full"
@@ -298,18 +301,28 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
     >
       {/* Visual Canvas */}
       <div className="relative w-full aspect-square bg-[#030712] overflow-hidden border-b border-[#1F2937]">
-        {project.images && project.images.length > 0 ? (
+        {hasImage ? (
           <Image 
             src={project.images[0]} 
-            alt={project.title} 
+            alt="" 
             fill
             unoptimized
+            onError={() => setImgError(true)}
             className="object-cover opacity-85 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-[#020617]/50">
-             <span className="font-mono text-[10px] text-[#00F2FF]/40 tracking-widest uppercase">No Render</span>
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.08)_0%,transparent_75%)] relative p-6 select-none">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,242,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,242,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+            <div className="w-12 h-12 rounded-xl bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] mb-3 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+              <FileBarChart className="w-6 h-6" />
+            </div>
+            <span className="font-mono text-[10px] text-[#00F2FF] font-bold tracking-widest uppercase text-center">
+              3D CAD SPECIFICATION
+            </span>
+            <span className="font-mono text-[8px] text-[#94A3B8]/60 tracking-wider uppercase mt-1">
+              ENGINEERING SCHEMATIC
+            </span>
           </div>
         )}
 

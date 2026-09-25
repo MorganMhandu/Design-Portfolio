@@ -18,31 +18,32 @@ const getSupabase = () => {
 };
 
 export async function GET() {
+  const DB_PATH = path.join(process.cwd(), "src/data/db.json");
+  const getLocalData = () => {
+    try {
+      return JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
+    } catch {
+      return { projects: [], pillars: [], reports: [], systems: [], settings: {} };
+    }
+  };
+
   try {
     if (!supabaseUrl || !supabaseKey) {
-      // Fallback to local DB if Supabase isn't configured yet
-      const DB_PATH = path.join(process.cwd(), "src/data/db.json");
-      const data = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
-      return NextResponse.json(data, { headers: { "Cache-Control": "no-store, max-age=0" } });
+      return NextResponse.json(getLocalData(), { headers: { "Cache-Control": "no-store, max-age=0" } });
     }
 
     const supabase = getSupabase();
     if (!supabase) {
-      throw new Error("Supabase client not initialized");
+      return NextResponse.json(getLocalData(), { headers: { "Cache-Control": "no-store, max-age=0" } });
     }
 
     const { data: fileData, error } = await supabase.storage
       .from(bucketName)
       .download("db.json");
 
-    if (error) {
-      if (error.message.includes("Object not found") || error.message.includes("not found")) {
-        // Fallback to local DB but DON'T seed it automatically (to prevent overwriting with stale data)
-        const DB_PATH = path.join(process.cwd(), "src/data/db.json");
-        const localData = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
-        return NextResponse.json(localData, { headers: { "Cache-Control": "no-store, max-age=0" } });
-      }
-      throw new Error(`Failed to download db.json from Supabase: ${error.message}`);
+    if (error || !fileData) {
+      console.warn("Supabase db download warning, serving local fallback:", error?.message);
+      return NextResponse.json(getLocalData(), { headers: { "Cache-Control": "no-store, max-age=0" } });
     }
 
     const text = await fileData.text();
@@ -50,8 +51,8 @@ export async function GET() {
 
     return NextResponse.json(json, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (error: any) {
-    console.error("GET DB error:", error);
-    return NextResponse.json({ error: error.message || "Failed to read database" }, { status: 500 });
+    console.warn("GET DB fetch error, serving local fallback:", error.message);
+    return NextResponse.json(getLocalData(), { headers: { "Cache-Control": "no-store, max-age=0" } });
   }
 }
 
