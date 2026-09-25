@@ -203,11 +203,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     async function init() {
       const local = await loadFromStorage();
       if (local) {
-        if (Array.isArray(local.projects) && local.projects.length > 0) setProjects(local.projects);
-        if (Array.isArray(local.pillars) && local.pillars.length > 0) setPillars(local.pillars);
+        if (Array.isArray(local.projects)) setProjects(local.projects);
+        if (Array.isArray(local.pillars)) setPillars(local.pillars);
         if (Array.isArray(local.reports)) setReports(local.reports);
         if (Array.isArray(local.messages)) setMessages(local.messages);
-        if (Array.isArray(local.systems) && local.systems.length > 0) setSystems(local.systems);
+        if (Array.isArray(local.systems)) setSystems(local.systems);
         if (local.settings) setSettings(local.settings);
       }
       setInitialized(true);
@@ -250,11 +250,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           setTimeout(() => setSyncStatus("idle"), 2000);
         } else {
           // Cloud is newer or equal — update local state from cloud
-          if (Array.isArray(cloudData.projects) && cloudData.projects.length > 0) setProjects(cloudData.projects);
-          if (Array.isArray(cloudData.pillars) && cloudData.pillars.length > 0) setPillars(cloudData.pillars);
+          if (Array.isArray(cloudData.projects)) setProjects(cloudData.projects);
+          if (Array.isArray(cloudData.pillars)) setPillars(cloudData.pillars);
           if (Array.isArray(cloudData.reports)) setReports(cloudData.reports);
           if (Array.isArray(cloudData.messages)) setMessages(cloudData.messages);
-          if (Array.isArray(cloudData.systems) && cloudData.systems.length > 0) setSystems(cloudData.systems);
+          if (Array.isArray(cloudData.systems)) setSystems(cloudData.systems);
           if (cloudData.settings) setSettings(cloudData.settings);
           await saveToStorage(cloudData);
           setSyncStatus("success");
@@ -312,9 +312,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         setSyncStatus("success");
         setTimeout(() => setSyncStatus("idle"), 3000);
       } catch (err: any) {
-        console.error("Cloud sync error:", err);
-        alert(`CLOUD SYNC ERROR: ${err.message}`);
-        setSyncStatus("error");
+        console.warn("Cloud sync warning (saved locally):", err.message);
+        setSyncStatus("idle");
       }
     },
     [projects, pillars, reports, messages, systems, settings]

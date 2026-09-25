@@ -63,19 +63,67 @@ function ProjectForm({
   const set = (key: keyof typeof form, val: any) =>
     setForm((prev) => ({ ...prev, [key]: val }));
 
+  const readFileAsOptimizedDataUrl = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (file.type.startsWith("image/")) {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target?.result as string;
+        };
+        img.onload = () => {
+          const MAX_DIM = 1600;
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > MAX_DIM) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            }
+          } else {
+            if (height > MAX_DIM) {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.85));
+          } else {
+            resolve(img.src);
+          }
+        };
+        img.onerror = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: "images" | "zipUrl" | "pdfUrl" | "videoUrl") => {
     if (!e.target.files || e.target.files.length === 0) return;
 
     setIsUploading(true);
-    setUploadStatus(`Uploading ${field}...`);
+    setUploadStatus(`Processing ${field}...`);
 
     const files = Array.from(e.target.files);
+    const uploadedUrls: string[] = [];
 
-    try {
-      const folder = field === "images" ? "portfolio/projects/renders" : field === "zipUrl" ? "portfolio/projects/zip" : field === "videoUrl" ? "portfolio/projects/videos" : "portfolio/projects/pdf";
-      const uploadedUrls: string[] = [];
+    for (const file of files) {
+      let finalUrl = "";
 
-      for (const file of files) {
+      // 1. Try cloud upload via presign if configured
+      try {
+        const folder = field === "images" ? "portfolio/projects/renders" : field === "zipUrl" ? "portfolio/projects/zip" : field === "videoUrl" ? "portfolio/projects/videos" : "portfolio/projects/pdf";
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
         const filename = `${folder}/${uniqueSuffix}-${file.name.replace(/\s+/g, "_")}`;
 
@@ -84,35 +132,47 @@ function ProjectForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ filename })
         });
-        const presignData = await presignRes.json();
 
-        if (!presignRes.ok || presignData.error) {
-          throw new Error(presignData.error || "Failed to get upload URL");
+        if (presignRes.ok) {
+          const presignData = await presignRes.json();
+          if (presignData.signedUrl && !presignData.error) {
+            const uploadRes = await fetch(presignData.signedUrl, {
+              method: "PUT",
+              headers: { "Content-Type": file.type },
+              body: file
+            });
+            if (uploadRes.ok) {
+              finalUrl = presignData.publicUrl;
+            }
+          }
         }
-
-        const uploadRes = await fetch(presignData.signedUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file
-        });
-
-        if (!uploadRes.ok) throw new Error(`Failed to upload ${file.name}`);
-
-        uploadedUrls.push(presignData.publicUrl);
+      } catch (cloudErr) {
+        console.warn("Cloud upload unavailable, falling back to local asset encoder:", cloudErr);
       }
 
+      // 2. Resilient fallback: convert to optimized Data URL if cloud is unreachable
+      if (!finalUrl) {
+        try {
+          finalUrl = await readFileAsOptimizedDataUrl(file);
+        } catch (readErr: any) {
+          console.error("Local file read error:", readErr);
+        }
+      }
+
+      if (finalUrl) {
+        uploadedUrls.push(finalUrl);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
       if (field === "images") {
         set("images", [...form.images, ...uploadedUrls]);
       } else {
         set(field, uploadedUrls[0]);
       }
-      setUploadStatus(null);
-      setIsUploading(false);
-    } catch (err: any) {
-      alert(`Upload failed: ${err.message}`);
-      setIsUploading(false);
-      setUploadStatus(null);
     }
+    setUploadStatus(null);
+    setIsUploading(false);
   };
 
   const removeImage = (idx: number) =>

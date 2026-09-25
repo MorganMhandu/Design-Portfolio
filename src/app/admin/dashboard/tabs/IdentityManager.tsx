@@ -46,6 +46,9 @@ export function IdentityManager() {
 
     setUploading(true);
 
+    let finalUrl = "";
+
+    // 1. Try cloud upload via presign
     try {
       const folder = field === "profilePicture" ? "portfolio/identity/images" : "portfolio/identity/videos";
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
@@ -56,27 +59,42 @@ export function IdentityManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename })
       });
-      const presignData = await presignRes.json();
 
-      if (!presignRes.ok || presignData.error) {
-        throw new Error(presignData.error || "Failed to get upload URL");
+      if (presignRes.ok) {
+        const presignData = await presignRes.json();
+        if (presignData.signedUrl && !presignData.error) {
+          const uploadRes = await fetch(presignData.signedUrl, {
+            method: "PUT",
+            headers: { "Content-Type": file.type },
+            body: file
+          });
+          if (uploadRes.ok) {
+            finalUrl = presignData.publicUrl;
+          }
+        }
       }
-
-      const uploadRes = await fetch(presignData.signedUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file
-      });
-
-      if (!uploadRes.ok) throw new Error("Failed to upload identity asset");
-
-      handleChange(field, presignData.publicUrl);
-    } catch (error: any) {
-      console.error("Upload failed:", error);
-      alert(`Upload failed: ${error.message}`);
-    } finally {
-      setUploading(false);
+    } catch (cloudErr) {
+      console.warn("Cloud upload attempt skipped:", cloudErr);
     }
+
+    // 2. Fallback to local Data URL
+    if (!finalUrl) {
+      try {
+        finalUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      } catch (err: any) {
+        console.error("Local file conversion failed:", err);
+      }
+    }
+
+    if (finalUrl) {
+      handleChange(field, finalUrl);
+    }
+    setUploading(false);
   };
 
   return (
