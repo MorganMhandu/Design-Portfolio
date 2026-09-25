@@ -303,6 +303,7 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
             src={project.images[0]} 
             alt={project.title} 
             fill
+            unoptimized
             className="object-cover opacity-85 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
@@ -353,7 +354,7 @@ export function CaseStudies() {
   const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   return (
-    <Section id="projects">
+    <Section id="projects" className="pt-12 md:pt-20">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <SectionHeading>Technical Projects</SectionHeading>
         
