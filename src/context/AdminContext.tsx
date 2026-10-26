@@ -124,14 +124,21 @@ async function saveToStorage(data: any) {
 
 // ─── Context Shape ────────────────────────────────────────────────────────────
 
+export type SyncResult = {
+  success: boolean;
+  isLocalOnly?: boolean;
+  warning?: string;
+  error?: string;
+};
+
 type AdminContextType = {
-  syncStatus: "idle" | "syncing" | "success" | "error";
+  syncStatus: "idle" | "syncing" | "success" | "error" | "local-only";
 
   projects: CaseProject[];
-  addProject: (p: Omit<CaseProject, "id">) => void;
-  editProject: (id: string, p: Partial<CaseProject>) => void;
-  deleteProject: (id: string) => void;
-  clearAllProjects: () => void;
+  addProject: (p: Omit<CaseProject, "id">) => Promise<SyncResult>;
+  editProject: (id: string, p: Partial<CaseProject>) => Promise<SyncResult>;
+  deleteProject: (id: string) => Promise<SyncResult>;
+  clearAllProjects: () => Promise<SyncResult>;
 
   pillars: Pillar[];
   addPillar: (p: Omit<Pillar, "id">) => void;
@@ -312,11 +319,21 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           throw new Error(`Sync failed (${res.status}): ${text.slice(0, 100)}`);
         }
         
+        const resData = await res.json().catch(() => ({}));
+        if (resData.isLocalOnly) {
+          setSyncStatus("local-only");
+          setTimeout(() => setSyncStatus("idle"), 4000);
+          return { success: true, isLocalOnly: true, warning: resData.warning };
+        }
+
         setSyncStatus("success");
         setTimeout(() => setSyncStatus("idle"), 3000);
+        return { success: true, isLocalOnly: false };
       } catch (err: any) {
         console.warn("Cloud sync warning (saved locally):", err.message);
-        setSyncStatus("idle");
+        setSyncStatus("error");
+        setTimeout(() => setSyncStatus("idle"), 4000);
+        return { success: false, error: err.message };
       }
     },
     [projects, pillars, reports, messages, systems, settings]
@@ -366,27 +383,27 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   }, [projects, pillars, reports, messages, systems, settings]);
 
   // ── Projects ──
-  const addProject = useCallback((p: Omit<CaseProject, "id">) => {
+  const addProject = useCallback(async (p: Omit<CaseProject, "id">) => {
     const newList = [...projects, { ...p, id: uid() }];
     setProjects(newList);
-    syncData({ projects: newList });
+    return await syncData({ projects: newList });
   }, [projects, syncData]);
 
-  const editProject = useCallback((id: string, p: Partial<CaseProject>) => {
+  const editProject = useCallback(async (id: string, p: Partial<CaseProject>) => {
     const newList = projects.map((x) => (x.id === id ? { ...x, ...p } : x));
     setProjects(newList);
-    syncData({ projects: newList });
+    return await syncData({ projects: newList });
   }, [projects, syncData]);
 
-  const deleteProject = useCallback((id: string) => {
+  const deleteProject = useCallback(async (id: string) => {
     const newList = projects.filter((x) => x.id !== id);
     setProjects(newList);
-    syncData({ projects: newList });
+    return await syncData({ projects: newList });
   }, [projects, syncData]);
 
-  const clearAllProjects = useCallback(() => {
+  const clearAllProjects = useCallback(async () => {
     setProjects([]);
-    syncData({ projects: [] });
+    return await syncData({ projects: [] });
   }, [syncData]);
 
   // ── Pillars ──

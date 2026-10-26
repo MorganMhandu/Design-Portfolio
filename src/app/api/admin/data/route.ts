@@ -61,11 +61,16 @@ export async function POST(request: Request) {
     const newData = await request.json();
     const DB_PATH = path.join(process.cwd(), "src/data/db.json");
 
-    // 1. Always attempt to write to local DB
+    let localWriteSuccess = false;
+    let cloudUploadSuccess = false;
+    let cloudErrorMsg = "";
+
+    // 1. Attempt to write to local DB (succeeds in local dev, fails on Vercel read-only filesystem)
     try {
       fs.writeFileSync(DB_PATH, JSON.stringify(newData, null, 2), "utf8");
-    } catch (fsErr) {
-      console.warn("Could not write to local db.json (read-only filesystem):", fsErr);
+      localWriteSuccess = true;
+    } catch (fsErr: any) {
+      console.warn("Could not write to local db.json (read-only filesystem):", fsErr?.message);
     }
 
     // 2. If Supabase credentials exist, try cloud backup gracefully
@@ -82,15 +87,34 @@ export async function POST(request: Request) {
               cacheControl: "0",
             });
           if (error) {
+            cloudErrorMsg = error.message;
             console.warn("Supabase storage upload error:", error.message);
+          } else {
+            cloudUploadSuccess = true;
           }
         } catch (sbErr: any) {
+          cloudErrorMsg = sbErr.message;
           console.warn("Supabase cloud backup skipped:", sbErr.message);
         }
       }
+    } else {
+      cloudErrorMsg = "Supabase credentials missing on Vercel environment";
     }
 
-    return NextResponse.json({ success: true, message: "SYNC SUCCESSFUL" });
+    if (!localWriteSuccess && !cloudUploadSuccess) {
+      return NextResponse.json({
+        success: true,
+        isLocalOnly: true,
+        warning: cloudErrorMsg || "Cloud storage unavailable",
+        message: "SAVED_LOCAL_ONLY: Vercel filesystem is read-only and cloud storage is unconfigured.",
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      isLocalOnly: false,
+      message: cloudUploadSuccess ? "SYNC SUCCESSFUL (CLOUD)" : "SYNC SUCCESSFUL (LOCAL DISK)",
+    });
   } catch (error: any) {
     console.error("POST DB error:", error);
     return NextResponse.json({ error: error.message || "Failed to update database" }, { status: 500 });

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useAdmin, CaseProject } from "@/context/AdminContext";
-import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText } from "lucide-react";
+import { useState, useRef } from "react";
+import { useAdmin, CaseProject, SyncResult } from "@/context/AdminContext";
+import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText, Download, Upload, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 const emptyProject = (): Omit<CaseProject, "id"> => ({
   title: "",
@@ -405,43 +405,147 @@ export function ProjectManager() {
   const [mode, setMode] = useState<"list" | "add" | "edit">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [synced, setSynced] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "local" | "error"; message: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSaveNew = async (p: Omit<CaseProject, "id">) => {
-    addProject(p);
+    const res = await addProject(p);
     setMode("list");
-    setSynced(true);
-    setTimeout(() => setSynced(false), 3000);
+    if (res?.isLocalOnly) {
+      setFeedback({
+        type: "local",
+        message: "Saved in this browser only. Cloud database (Supabase) is not configured in Vercel, so it will not appear on other browsers until exported & committed to GitHub, or Supabase is connected.",
+      });
+    } else if (res?.success) {
+      setFeedback({
+        type: "success",
+        message: "Project successfully synced to cloud and live across all devices.",
+      });
+    } else {
+      setFeedback({
+        type: "error",
+        message: `Saved locally, but cloud sync failed: ${res?.error || "Server unreachable"}`,
+      });
+    }
   };
 
   const handleSaveEdit = async (p: Omit<CaseProject, "id">) => {
-    if (editingId) editProject(editingId, p);
+    let res: SyncResult | undefined;
+    if (editingId) {
+      res = await editProject(editingId, p);
+    }
     setMode("list");
     setEditingId(null);
-    setSynced(true);
-    setTimeout(() => setSynced(false), 3000);
+    if (res?.isLocalOnly) {
+      setFeedback({
+        type: "local",
+        message: "Changes saved in this browser. To show across all devices, export your data or configure Supabase in Vercel.",
+      });
+    } else if (res?.success) {
+      setFeedback({
+        type: "success",
+        message: "Updates successfully synced across all devices.",
+      });
+    }
   };
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (window.confirm(`Remove "${title}" from portfolio? This cannot be undone.`)) {
-      deleteProject(id);
+      await deleteProject(id);
     }
+  };
+
+  const handleExportData = () => {
+    const payload = JSON.stringify({
+      projects,
+      lastUpdated: new Date().toISOString(),
+    }, null, 2);
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `portfolio-projects-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (Array.isArray(parsed.projects)) {
+          for (const proj of parsed.projects) {
+            const { id, ...rest } = proj;
+            await addProject(rest);
+          }
+          alert(`Successfully imported ${parsed.projects.length} project(s).`);
+        } else {
+          alert("Invalid portfolio file format.");
+        }
+      } catch (err: any) {
+        alert("Failed to parse JSON file: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const editingProject = projects.find((p) => p.id === editingId);
 
   return (
     <div className="flex flex-col gap-6">
-      {synced && (
-        <div className="bg-[#00F2FF]/10 border border-[#00F2FF]/40 rounded-lg p-3 flex items-center justify-center shadow-[0_0_20px_rgba(0,242,255,0.15)] animate-in slide-in-from-top-2 fade-in duration-300">
-          <p className="font-mono text-[10px] text-[#00F2FF] font-bold tracking-widest uppercase text-center flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00F2FF] animate-pulse" />
-            DATA SYNCED - Project is now live on the public site
-          </p>
+      {/* Notice regarding cloud sync vs browser local storage */}
+      {!process.env.NEXT_PUBLIC_SUPABASE_URL && (
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-300">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+            <div className="text-xs font-mono leading-relaxed">
+              <span className="font-bold text-amber-200 uppercase tracking-wider block sm:inline mr-2">Local Storage Mode:</span>
+              Cloud database (Supabase) is not configured in Vercel. Projects uploaded here are stored in this browser only. Use <strong>Export JSON</strong> to save or push your projects to the public site.
+            </div>
+          </div>
+          <button
+            onClick={handleExportData}
+            className="shrink-0 flex items-center gap-2 px-3 py-1.5 bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/40 rounded-lg text-amber-200 text-xs font-mono uppercase tracking-wider transition-all"
+            title="Download your project data and renders as JSON"
+          >
+            <Download className="w-3.5 h-3.5" /> Export JSON
+          </button>
         </div>
       )}
+
+      {/* Sync feedback banner */}
+      {feedback && (
+        <div className={`border rounded-lg p-3.5 flex items-center justify-between gap-3 shadow-lg animate-in slide-in-from-top-2 fade-in duration-300 ${
+          feedback.type === "success" 
+            ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-300"
+            : feedback.type === "local"
+            ? "bg-amber-500/10 border-amber-500/40 text-amber-200"
+            : "bg-red-500/10 border-red-500/40 text-red-300"
+        }`}>
+          <div className="flex items-center gap-2.5 text-xs font-mono">
+            {feedback.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            ) : feedback.type === "local" ? (
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            ) : (
+              <X className="w-4 h-4 text-red-400 shrink-0" />
+            )}
+            <span>{feedback.message}</span>
+          </div>
+          <button onClick={() => setFeedback(null)} className="opacity-60 hover:opacity-100 transition-opacity">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-mono text-base font-bold text-white tracking-[0.15em] uppercase">Project Manager</h2>
           <p className="font-mono text-[10px] text-[#94A3B8]/60 tracking-widest mt-0.5">
@@ -449,7 +553,31 @@ export function ProjectManager() {
           </p>
         </div>
         {mode === "list" && (
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <input 
+              type="file" 
+              accept="application/json" 
+              ref={fileInputRef} 
+              onChange={handleImportFile} 
+              className="hidden" 
+            />
+            
+            <button
+              onClick={handleExportData}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/5 border border-white/10 text-white/80 font-mono text-xs tracking-wider uppercase rounded-lg hover:bg-white/10 hover:text-white transition-all"
+              title="Export all projects and renders to JSON"
+            >
+              <Download className="w-3.5 h-3.5" /> Export
+            </button>
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/5 border border-white/10 text-white/80 font-mono text-xs tracking-wider uppercase rounded-lg hover:bg-white/10 hover:text-white transition-all"
+              title="Import projects from JSON file"
+            >
+              <Upload className="w-3.5 h-3.5" /> Import
+            </button>
+
             {projects.length > 0 && (
               <button
                 onClick={() => {
@@ -463,6 +591,7 @@ export function ProjectManager() {
                 <Trash2 className="w-3.5 h-3.5" /> Clear All
               </button>
             )}
+
             <button
               onClick={() => setMode("add")}
               className="flex items-center gap-2 px-4 py-2 bg-[#00F2FF]/10 border border-[#00F2FF]/40 text-[#00F2FF] font-mono text-xs tracking-widest uppercase rounded-lg hover:bg-[#00F2FF]/20 hover:border-[#00F2FF] transition-all"
