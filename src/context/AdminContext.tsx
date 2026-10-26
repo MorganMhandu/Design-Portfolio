@@ -131,6 +131,7 @@ type AdminContextType = {
   addProject: (p: Omit<CaseProject, "id">) => void;
   editProject: (id: string, p: Partial<CaseProject>) => void;
   deleteProject: (id: string) => void;
+  clearAllProjects: () => void;
 
   pillars: Pillar[];
   addPillar: (p: Omit<Pillar, "id">) => void;
@@ -171,6 +172,13 @@ function uid() {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
+const sanitizeProjects = (projectsList: any[]): CaseProject[] => {
+  if (!Array.isArray(projectsList)) return [];
+  return projectsList.filter(
+    (p) => p && p.id !== "proj-1" && !p.title?.toLowerCase().includes("autonomous material handling")
+  );
+};
+
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<CaseProject[]>(DEFAULT_PROJECTS);
   const [pillars, setPillars] = useState<Pillar[]>(DEFAULT_PILLARS);
@@ -186,7 +194,13 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     async function init() {
       const local = await loadFromStorage();
       if (local) {
-        if (Array.isArray(local.projects)) setProjects(local.projects);
+        if (Array.isArray(local.projects)) {
+          const clean = sanitizeProjects(local.projects);
+          setProjects(clean);
+          if (clean.length !== local.projects.length) {
+            saveToStorage({ ...local, projects: clean, lastUpdated: new Date().toISOString() });
+          }
+        }
         if (Array.isArray(local.pillars)) setPillars(local.pillars);
         if (Array.isArray(local.reports)) setReports(local.reports);
         if (Array.isArray(local.messages)) setMessages(local.messages);
@@ -222,24 +236,30 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         const cloudTs = cloudData.lastUpdated ? new Date(cloudData.lastUpdated).getTime() : 0;
         
         if (localTs > cloudTs && localData) {
-          // Local is NEWER — push local data to cloud to make it authoritative
+          // Local is NEWER — sanitize and push local data to cloud
+          const cleanLocal = {
+            ...localData,
+            projects: sanitizeProjects(localData.projects || []),
+          };
           console.log("Local data is newer — pushing to cloud to sync other browsers.");
           await fetch("/api/admin/data", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(localData),
+            body: JSON.stringify(cleanLocal),
           });
+          setProjects(cleanLocal.projects);
           setSyncStatus("success");
           setTimeout(() => setSyncStatus("idle"), 2000);
         } else {
           // Cloud is newer or equal — update local state from cloud
-          if (Array.isArray(cloudData.projects)) setProjects(cloudData.projects);
+          const cleanProjects = Array.isArray(cloudData.projects) ? sanitizeProjects(cloudData.projects) : [];
+          setProjects(cleanProjects);
           if (Array.isArray(cloudData.pillars)) setPillars(cloudData.pillars);
           if (Array.isArray(cloudData.reports)) setReports(cloudData.reports);
           if (Array.isArray(cloudData.messages)) setMessages(cloudData.messages);
           if (Array.isArray(cloudData.systems)) setSystems(cloudData.systems);
           if (cloudData.settings) setSettings(cloudData.settings);
-          await saveToStorage(cloudData);
+          await saveToStorage({ ...cloudData, projects: cleanProjects });
           setSyncStatus("success");
           setTimeout(() => setSyncStatus("idle"), 2000);
         }
@@ -364,6 +384,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     syncData({ projects: newList });
   }, [projects, syncData]);
 
+  const clearAllProjects = useCallback(() => {
+    setProjects([]);
+    syncData({ projects: [] });
+  }, [syncData]);
+
   // ── Pillars ──
   const addPillar = useCallback((p: Omit<Pillar, "id">) => {
     const newList = [...pillars, { ...p, id: uid() }];
@@ -454,7 +479,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     <AdminContext.Provider
       value={{
         syncStatus,
-        projects, addProject, editProject, deleteProject,
+        projects, addProject, editProject, deleteProject, clearAllProjects,
         pillars, addPillar, editPillar, deletePillar,
         reports, addReport, editReport, deleteReport,
         messages, addMessage, markRead, deleteMessage,

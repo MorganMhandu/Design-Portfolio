@@ -63,8 +63,8 @@ export function Experience() {
   ];
 
   return (
-    <Section id="projects">
-      <SectionHeading>Projects</SectionHeading>
+    <Section id="experience">
+      <SectionHeading>Experience</SectionHeading>
       <div className="flex flex-col gap-10">
         {experiences.map((exp, idx) => (
           <div key={idx} className="border border-muted/50 bg-background/40 backdrop-blur-sm rounded-none p-6 md:p-8 flex flex-col md:flex-row gap-8 relative group hover:border-accent/40 transition-colors">

@@ -331,7 +331,7 @@ export function CaseStudies() {
   }, [projects]);
 
   const validProjects = [...projects]
-    .filter(p => p.title || p.focus || p.components || p.automation)
+    .filter(p => p && p.title && p.images && p.images.length > 0)
     .sort((a, b) => (a.order || 0) - (b.order || 0));
   const selectedProject = projects.find(p => p.id === selectedProjectId);
 

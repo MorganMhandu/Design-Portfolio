@@ -401,7 +401,7 @@ function ProjectForm({
 }
 
 export function ProjectManager() {
-  const { projects, addProject, editProject, deleteProject } = useAdmin();
+  const { projects, addProject, editProject, deleteProject, clearAllProjects } = useAdmin();
   const [mode, setMode] = useState<"list" | "add" | "edit">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -449,12 +449,27 @@ export function ProjectManager() {
           </p>
         </div>
         {mode === "list" && (
-          <button
-            onClick={() => setMode("add")}
-            className="flex items-center gap-2 px-4 py-2 bg-[#00F2FF]/10 border border-[#00F2FF]/40 text-[#00F2FF] font-mono text-xs tracking-widest uppercase rounded-lg hover:bg-[#00F2FF]/20 hover:border-[#00F2FF] transition-all"
-          >
-            <Plus className="w-4 h-4" /> New Case Study
-          </button>
+          <div className="flex items-center gap-3">
+            {projects.length > 0 && (
+              <button
+                onClick={() => {
+                  if (window.confirm("Remove ALL projects from portfolio? This will completely clean the slate.")) {
+                    clearAllProjects();
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 font-mono text-xs tracking-widest uppercase rounded-lg hover:bg-red-500/20 hover:border-red-500 transition-all"
+                title="Purge all projects"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Clear All
+              </button>
+            )}
+            <button
+              onClick={() => setMode("add")}
+              className="flex items-center gap-2 px-4 py-2 bg-[#00F2FF]/10 border border-[#00F2FF]/40 text-[#00F2FF] font-mono text-xs tracking-widest uppercase rounded-lg hover:bg-[#00F2FF]/20 hover:border-[#00F2FF] transition-all"
+            >
+              <Plus className="w-4 h-4" /> New Case Study
+            </button>
+          </div>
         )}
       </div>
 
