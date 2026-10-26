@@ -122,17 +122,18 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <div className={`w-1.5 h-1.5 rounded-full ${
               syncStatus === 'error' ? 'bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.9)]' : 
-              process.env.NEXT_PUBLIC_SUPABASE_URL ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]' : 
-              'bg-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.9)]'
+              syncStatus === 'local-only' ? 'bg-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.9)]' :
+              'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]'
             } animate-pulse`} />
             <span className={`font-mono text-[9px] tracking-[0.25em] uppercase ${
               syncStatus === 'error' ? 'text-red-400' : 
-              process.env.NEXT_PUBLIC_SUPABASE_URL ? 'text-emerald-400' : 
-              'text-yellow-400'
+              syncStatus === 'local-only' ? 'text-yellow-400' :
+              'text-emerald-400'
             }`}>
               {syncStatus === 'syncing' ? 'SYNCING_DATA...' : 
                syncStatus === 'success' ? 'SYNC SUCCESSFUL' : 
-               process.env.NEXT_PUBLIC_SUPABASE_URL ? 'CLOUD_DATABASE: ONLINE' : 'LOCAL_STORAGE: ACTIVE (NON-PERSISTENT)'}
+               syncStatus === 'local-only' ? 'LOCAL_STORAGE: ACTIVE (NON-PERSISTENT)' :
+               'CLOUD_DATABASE: ONLINE'}
             </span>
           </div>
           

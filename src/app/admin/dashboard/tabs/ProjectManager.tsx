@@ -401,7 +401,7 @@ function ProjectForm({
 }
 
 export function ProjectManager() {
-  const { projects, addProject, editProject, deleteProject, clearAllProjects } = useAdmin();
+  const { projects, addProject, editProject, deleteProject, clearAllProjects, syncStatus } = useAdmin();
   const [mode, setMode] = useState<"list" | "add" | "edit">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -500,7 +500,7 @@ export function ProjectManager() {
   return (
     <div className="flex flex-col gap-6">
       {/* Notice regarding cloud sync vs browser local storage */}
-      {!process.env.NEXT_PUBLIC_SUPABASE_URL && (
+      {syncStatus === "local-only" && (
         <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-300">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
