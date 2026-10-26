@@ -75,24 +75,7 @@ export type AdminSettings = {
 
 // ─── Default State ────────────────────────────────────────────────────────────
 
-const DEFAULT_PROJECTS: CaseProject[] = [
-  {
-    id: "proj-1",
-    title: "Autonomous Material Handling System",
-    focus: "Predictive Maintenance & Load Optimization",
-    components: "Grizzly bars, Impact Rotors, Heavy-duty Conveyors, and Structural Support Framework",
-    automation: "PLC Load Monitoring, Proximity Sensors, Variable Frequency Drives (VFD), and Automated Feeder Control.",
-    images: ["/images/autonomous-material-handling.jpg"],
-    cadSize: "142 MB",
-    dwgSize: "18 MB",
-    renderSize: "1.2 GB",
-    zipUrl: "",
-    pdfUrl: "",
-    reports: [],
-    order: 1,
-    videoUrl: ""
-  }
-];
+const DEFAULT_PROJECTS: CaseProject[] = [];
 
 const DEFAULT_PILLARS: Pillar[] = [
   { id: "pillar-1", title: "Mechanical Design & Simulation", iconName: "Hexagon", bullets: ["Precision Assembly Modeling", "Structural Integrity & FEA", "Advanced GD&T", "High-Fidelity Visualization (Blender/Lumion)"] },

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
-import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText, FileArchive } from "lucide-react";
+import { Plus, Edit2, Trash2, X, ChevronDown, ChevronUp, Camera, Save, Loader2, FileText } from "lucide-react";
 
 const emptyProject = (): Omit<CaseProject, "id"> => ({
   title: "",
@@ -216,25 +216,18 @@ function ProjectForm({
             </div>
           </div>
         </div>
-        <InputField label="Mechanical Components" value={form.components} onChange={(v) => set("components", v)} placeholder="e.g., Jaw Crusher Frame, Impact Rotors" required />
-        <InputField label="Automation Stack" value={form.automation} onChange={(v) => set("automation", v)} placeholder="e.g., PLC Load Monitoring, Proximity Sensors" required />
-
-        {/* File Sizes */}
-        <div className="grid grid-cols-3 gap-4">
-          <InputField label="CAD File Size" value={form.cadSize || ""} onChange={(v) => set("cadSize", v)} placeholder="e.g., 142 MB" />
-          <InputField label="DWG File Size" value={form.dwgSize || ""} onChange={(v) => set("dwgSize", v)} placeholder="e.g., 18 MB" />
-          <InputField label="Render Size" value={form.renderSize || ""} onChange={(v) => set("renderSize", v)} placeholder="e.g., 1.2 GB" />
-        </div>
+        <InputField label="Key Specifications" value={form.components} onChange={(v) => set("components", v)} placeholder="e.g., Heavy-Duty Framework, Wear Plates" />
+        <InputField label="Technical Highlights" value={form.automation} onChange={(v) => set("automation", v)} placeholder="e.g., Automated Material Flow, Sensor Monitoring" />
 
         {/* Image Upload */}
         <div className="flex flex-col gap-2">
           <label className="font-mono text-[9px] tracking-[0.25em] text-[#00F2FF]/70 uppercase">
-            Project Renders / Images
+            Project 3D Renders / Visuals
           </label>
           <label className="flex items-center gap-3 border border-dashed border-[#00F2FF]/25 rounded-lg p-4 cursor-pointer hover:border-[#00F2FF]/50 hover:bg-[#00F2FF]/5 transition-all">
             {isUploading && uploadStatus?.includes("images") ? <Loader2 className="w-4 h-4 text-[#00F2FF] animate-spin" /> : <Camera className="w-4 h-4 text-[#00F2FF]/60" />}
             <span className="font-mono text-[10px] text-[#94A3B8]/60 tracking-widest">
-              {isUploading && uploadStatus?.includes("images") ? "UPLOADING_ASSETS..." : "Click to upload renders (JPG, PNG, WebP) - MULTIPLE SELECTION SUPPORTED"}
+              {isUploading && uploadStatus?.includes("images") ? "UPLOADING_RENDERS..." : "Click to upload 3D renders (JPG, PNG, WebP) - MULTIPLE SELECTION SUPPORTED"}
             </span>
             <input type="file" multiple accept="image/*" onChange={(e) => handleFileUpload(e, "images")} className="hidden" disabled={isUploading} />
           </label>
@@ -253,48 +246,13 @@ function ProjectForm({
                   </button>
                 </div>
               ))}
-              <p className="text-[9px] font-mono text-[#00F2FF]/50 self-center">{form.images.length} file(s) persisted</p>
+              <p className="text-[9px] font-mono text-[#00F2FF]/50 self-center">{form.images.length} render(s) attached</p>
             </div>
           )}
         </div>
 
         {/* Technical Asset Uploads */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#00F2FF]/10">
-          <div className="flex flex-col gap-2">
-            <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
-              <span>Technical ZIP Package</span>
-              {form.zipUrl && <span className="text-emerald-400 text-[7px]">READY</span>}
-            </label>
-            <div className="relative">
-              {form.zipUrl ? (
-                <div className="flex items-center gap-3 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-lg p-3">
-                  <FileArchive className="w-5 h-5 text-[#00F2FF]" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-[10px] text-[#00F2FF] truncate">Technical_Assets.zip</p>
-                    <p className="font-mono text-[7px] text-[#00F2FF]/50 truncate uppercase tracking-widest">Linked Asset Active</p>
-                  </div>
-                  <button 
-                    type="button" 
-                    onClick={() => set("zipUrl", "")}
-                    className="p-1.5 text-red-400/50 hover:text-red-400 hover:bg-red-400/10 rounded transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
-                <input
-                  type="file"
-                  accept=".zip,.rar,.7z"
-                  onChange={(e) => handleFileUpload(e, "zipUrl")}
-                  className="w-full text-[9px] text-white/40 font-mono file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-[9px] file:bg-[#00F2FF]/15 file:text-[#00F2FF] hover:file:bg-[#00F2FF]/25 file:font-mono cursor-pointer bg-black/20 border border-[#00F2FF]/10 rounded-lg p-1"
-                  disabled={isUploading}
-                />
-              )}
-              {isUploading && uploadStatus?.includes("zipUrl") && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00F2FF] animate-spin" />
-              )}
-            </div>
-          </div>
+        <div className="flex flex-col gap-4 pt-2 border-t border-[#00F2FF]/10">
           <div className="flex flex-col gap-2">
             <label className="font-mono text-[9px] tracking-[0.2em] text-[#00F2FF]/70 uppercase flex items-center justify-between">
               <span>Engineering Report (PDF)</span>
@@ -560,38 +518,28 @@ export function ProjectManager() {
                 </div>
               </div>
               {expanded === proj.id && (
-                <div className="border-t border-[#00F2FF]/10 px-5 py-4 bg-black/20 grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="border-t border-[#00F2FF]/10 px-5 py-4 bg-black/20 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { label: "Components", value: proj.components },
-                    { label: "Automation", value: proj.automation },
-                    { label: "CAD/DWG/Render", value: `${proj.cadSize || "—"} / ${proj.dwgSize || "—"} / ${proj.renderSize || "—"}` },
+                    { label: "Specifications", value: proj.components },
+                    { label: "Technical Highlights", value: proj.automation },
                   ].map(({ label, value }) => (
-                    <div key={label}>
-                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">{label}</p>
-                      <p className="font-mono text-[10px] text-[#94A3B8] leading-relaxed">{value}</p>
-                    </div>
+                    value ? (
+                      <div key={label}>
+                        <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">{label}</p>
+                        <p className="font-mono text-[10px] text-[#94A3B8] leading-relaxed">{value}</p>
+                      </div>
+                    ) : null
                   ))}
-                  <div className="col-span-full grid grid-cols-2 gap-4 mt-2 pt-3 border-t border-[#00F2FF]/5">
+                  <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 pt-3 border-t border-[#00F2FF]/5">
                     <div>
-                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">ZIP Package</p>
-                      {proj.zipUrl ? (
-                        <div className="flex items-center gap-2">
-                          <FileArchive className="w-3.5 h-3.5 text-[#00F2FF]" />
-                          <span className="font-mono text-[9px] text-[#00F2FF] uppercase">Linked Asset Active</span>
-                        </div>
-                      ) : (
-                        <p className="font-mono text-[9px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">Main Engineering Report</p>
+                      <p className="font-mono text-[8px] tracking-widest text-[#00F2FF]/50 uppercase mb-1">Engineering Report</p>
                       {proj.pdfUrl ? (
                         <div className="flex items-center gap-2">
                           <FileText className="w-3.5 h-3.5 text-[#00F2FF]" />
                           <span className="font-mono text-[9px] text-[#00F2FF] uppercase">Main Report Active</span>
                         </div>
                       ) : (
-                        <p className="font-mono text-[9px] text-white/20 uppercase tracking-widest">Not Uploaded</p>
+                        <p className="font-mono text-[9px] text-white/20 uppercase tracking-widest">No Report Attached</p>
                       )}
                     </div>
                     {proj.reports && proj.reports.length > 0 && (

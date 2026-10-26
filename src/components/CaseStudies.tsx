@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Section, SectionHeading } from "./Section";
-import { FileText, FileBarChart, ChevronLeft, ChevronRight, X, ChevronDown, PlayCircle } from "lucide-react";
+import { FileText, ChevronLeft, ChevronRight, X, ChevronDown, PlayCircle, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useAdmin, CaseProject } from "@/context/AdminContext";
 
@@ -10,14 +10,12 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () => void }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [downloadingZip, setDownloadingZip] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showReportList, setShowReportList] = useState(false);
 
-  const handleDownload = async (url: string, filename: string, type: 'zip' | 'pdf') => {
-    if (type === 'zip') setDownloadingZip(true);
-    else setDownloadingPdf(true);
+  const handleDownload = async (url: string, filename: string) => {
+    setDownloadingPdf(true);
 
     try {
       // Simulate a small delay to allow the UI to update
@@ -47,8 +45,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
       console.error('Download failed', error);
       alert('Download failed. The file may be invalid or too large.');
     } finally {
-      if (type === 'zip') setDownloadingZip(false);
-      else setDownloadingPdf(false);
+      setDownloadingPdf(false);
     }
   };
 
@@ -167,29 +164,6 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
 
             {/* Action Bay */}
             <div className="mt-auto flex flex-col gap-3">
-              {project.zipUrl && (project.zipUrl.startsWith("http") || project.zipUrl.startsWith("data:")) ? (
-                <button 
-                  onClick={() => handleDownload(project.zipUrl!, `${project.title.replace(/\s+/g, '_')}_Technical_Assets.zip`, 'zip')}
-                  disabled={downloadingZip}
-                  className="w-full flex items-center justify-between px-5 py-4 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-xl hover:bg-[#00F2FF]/20 transition-all group/btn disabled:opacity-70 disabled:cursor-wait"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="p-2.5 bg-black/40 rounded-lg text-[#00F2FF] border border-[#00F2FF]/20">
-                      {downloadingZip ? (
-                        <div className="w-5 h-5 border-2 border-[#00F2FF]/30 border-t-[#00F2FF] rounded-full animate-spin" />
-                      ) : (
-                        <FileBarChart className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div className="text-left">
-                      <p className="font-mono text-sm text-white tracking-widest uppercase">{downloadingZip ? "Preparing..." : "Technical Assets"}</p>
-                      <p className="font-mono text-[10px] text-[#00F2FF]/70 uppercase">{downloadingZip ? "Converting to file..." : "Download ZIP Package"}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-white/40 group-hover/btn:translate-x-1 transition-transform" />
-                </button>
-              ) : null}
-
               {/* Engineering Reports Entry Point */}
               {(project.pdfUrl || (project.reports && project.reports.length > 0)) ? (
                 <div className="flex flex-col gap-2">
@@ -267,7 +241,7 @@ function ProjectModal({ project, onClose }: { project: CaseProject; onClose: () 
                 <span className="font-mono text-xs text-[#00F2FF] tracking-widest uppercase">Report Preview</span>
                 <div className="flex items-center gap-4">
                   <button 
-                    onClick={() => handleDownload(previewUrl, "Engineering_Report.pdf", "pdf")}
+                    onClick={() => handleDownload(previewUrl, "Engineering_Report.pdf")}
                     className="flex items-center gap-2 px-4 py-1.5 bg-[#00F2FF] text-black font-mono text-[10px] font-bold uppercase rounded-lg hover:bg-[#00F2FF]/80 transition-all"
                   >
                     Download PDF
@@ -312,31 +286,26 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.08)_0%,transparent_75%)] relative p-6 select-none">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,242,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,242,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(0,242,255,0.06)_0%,transparent_75%)] relative p-6 select-none">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,242,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,242,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
             <div className="w-12 h-12 rounded-xl bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] mb-3 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(0,242,255,0.2)]">
-              <FileBarChart className="w-6 h-6" />
+              <ImageIcon className="w-6 h-6" />
             </div>
             <span className="font-mono text-[10px] text-[#00F2FF] font-bold tracking-widest uppercase text-center">
-              3D CAD SPECIFICATION
+              3D RENDER
             </span>
             <span className="font-mono text-[8px] text-[#94A3B8]/60 tracking-wider uppercase mt-1">
-              ENGINEERING SCHEMATIC
+              VISUAL SHOWCASE
             </span>
           </div>
         )}
-
-        {/* Index Tag */}
-        <div className="absolute top-3 left-3 px-2.5 py-1 rounded bg-[#030712]/90 border border-[#1F2937] font-mono text-[9px] text-[#00F2FF] font-bold">
-          CAD // 0{idx + 1}
-        </div>
       </div>
 
       {/* Info Payload */}
       <div className="p-5 flex flex-col flex-grow justify-between bg-gradient-to-t from-black/80 to-transparent">
         <div>
           <span className="font-mono text-[9px] text-[#94A3B8] tracking-widest uppercase block mb-1.5 truncate">
-            {project.focus || "ENGINEERING CASE STUDY"}
+            {project.focus || "PROJECT SHOWCASE"}
           </span>
           <h3 className="font-heading text-base font-bold tracking-tight text-white group-hover:text-[#00F2FF] transition-colors duration-300 line-clamp-2 mb-4">
             {project.title}
@@ -344,7 +313,7 @@ function ProjectCard({ project, idx, onOpen }: { project: CaseProject; idx: numb
         </div>
         
         <div className="pt-3 border-t border-[#1F2937] flex items-center justify-between w-full font-mono text-[10px] tracking-wider text-[#00F2FF]/80 group-hover:text-[#00F2FF] uppercase transition-colors">
-          <span>Inspect Model & Specs</span>
+          <span>View Project Details</span>
           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform" />
         </div>
       </div>
@@ -369,7 +338,7 @@ export function CaseStudies() {
   return (
     <Section id="projects" className="pt-12 md:pt-20">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-        <SectionHeading>Technical Projects</SectionHeading>
+        <SectionHeading>Projects & Renders</SectionHeading>
         
         {syncStatus === "syncing" && (
           <div className="flex items-center gap-2 px-3 py-1 bg-[#00F2FF]/10 border border-[#00F2FF]/30 rounded-full animate-pulse">
@@ -390,8 +359,12 @@ export function CaseStudies() {
             />
           ))}
           {validProjects.length === 0 && (
-            <div className="col-span-full text-center py-24 font-mono text-[#94A3B8]/30 text-xs tracking-widest uppercase border border-dashed border-[#00F2FF]/10 rounded-2xl">
-              No case studies published. Add projects via the Admin Dashboard.
+            <div className="col-span-full text-center py-24 px-4 rounded-2xl border border-dashed border-[#1F2937] bg-[#0B0F17]/30 flex flex-col items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-[#00F2FF]/10 border border-[#00F2FF]/30 flex items-center justify-center text-[#00F2FF] mb-3 shadow-[0_0_15px_rgba(0,242,255,0.15)]">
+                <ImageIcon className="w-5 h-5" />
+              </div>
+              <p className="font-heading text-sm font-semibold text-white/90 mb-1">Render Portfolio in Preparation</p>
+              <p className="font-mono text-xs text-[#94A3B8]/60 uppercase tracking-widest">New 3D Renders & Projects Publishing Shortly</p>
             </div>
           )}
       </div>
